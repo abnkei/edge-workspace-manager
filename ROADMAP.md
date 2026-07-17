@@ -28,6 +28,40 @@
 - เลือกปิดแล้วข้อมูล Session ล่าสุดต้องถูกบันทึกก่อน Process สิ้นสุด
 - การติดตั้งอัปเดตต้องปิดและเปิดโปรแกรมกลับได้โดยไม่มี Confirmation Dialog ขวาง Updater
 
+### Requested: New Tab Button on the Tab Strip
+
+- แสดงปุ่ม `+` ทางขวาต่อจาก Tab สุดท้ายของ Instance ปัจจุบัน
+- ปุ่มต้องเลื่อนตามตำแหน่งท้ายรายการเมื่อเพิ่ม ปิด Pin หรือสลับลำดับ Tab
+- คลิกแล้วสร้าง Web Tab ใหม่ใน Instance และ WebView2 Profile ปัจจุบัน
+- เปิด Home URL เริ่มต้นตามค่าของ Tab ใหม่โดยไม่ Reload Tab อื่น
+- รองรับ Light/Dark Theme, Thai/English และ Windows Display Scaling
+- มี Tooltip `เปิด Tab ใหม่ (Ctrl+T)` / `New tab (Ctrl+T)` และเข้าถึงได้ด้วย Keyboard
+
+### New Tab Button Acceptance Criteria
+
+- ปุ่ม `+` ต้องอยู่ต่อจาก Tab สุดท้ายและไม่ทับชื่อ Tab หรือปุ่มปิด
+- เมื่อ Tab ล้นพื้นที่ ปุ่มต้องยังเข้าถึงได้หรือเลื่อนไปพร้อมแถบ Tab อย่างถูกต้อง
+- การเปิด Tab ผ่านปุ่มต้องใช้พฤติกรรมเดียวกับ Toolbar และ `Ctrl+T`
+- การเพิ่มปุ่มต้องไม่กระทบการลากเรียง Pin/Unpin หรือ Focused Tab Highlight
+
+### Requested: Incognito Mode
+
+- เพิ่มคำสั่ง `New Incognito Instance` และ `New Incognito Tab` พร้อมสัญลักษณ์ที่แยกจากโหมดปกติชัดเจน
+- ใช้ WebView2 Profile ชั่วคราวแยกจาก Instance ปกติและไม่ใช้ Cookie, Login หรือ Session ร่วมกัน
+- ไม่บันทึก History, Address Suggestions, Recently Closed Tabs, Favorites หรือข้อมูล Session Recovery
+- ลบ Profile ชั่วคราวหลังปิด Incognito Instance หรือเมื่อปิดโปรแกรม โดย Retry การลบหาก WebView2 ยังถือไฟล์อยู่
+- แสดงคำเตือนว่า Incognito ไม่สามารถซ่อนกิจกรรมจากเว็บไซต์ ผู้ให้บริการอินเทอร์เน็ต นายจ้าง หรือระบบเครือข่ายองค์กร
+- Download ที่ผู้ใช้บันทึกลงดิสก์และ Bookmark ที่ผู้ใช้ส่งออกเองจะยังคงอยู่หลังปิด Incognito
+- ไม่ดึง Password หรือข้อมูลจาก 1Password โดยอัตโนมัติ และไม่รวม Incognito ใน Metadata Backup หรือ Cross-device Sync
+
+### Incognito Acceptance Criteria
+
+- Incognito ต้องไม่เห็น Cookie หรือ Login จาก Profile ปกติ และ Profile ปกติต้องไม่เห็นข้อมูลจาก Incognito
+- ปิด Incognito แล้ว History, URL, Tab และ Session ต้องไม่ปรากฏเมื่อเปิดโปรแกรมใหม่
+- ปิด Tab หรือ Instance ปกติต้องไม่ลบ Profile หรือ Session ที่ใช้งานอยู่
+- หากลบ Profile ชั่วคราวไม่สำเร็จ โปรแกรมต้องบันทึก Cleanup Queue และลองลบใหม่โดยไม่เปิดเผยข้อมูลใน UI
+- การ Update, Crash Recovery และ Close Confirmation ต้องไม่เปลี่ยน Incognito ให้กลายเป็น Session ถาวร
+
 ### Planned for v2.2.0: Password-encrypted Full Local Backup (Experimental)
 
 - สำรอง Metadata พร้อม WebView2 Profile เป็นตัวเลือกขั้นสูง
