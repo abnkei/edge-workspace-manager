@@ -2,7 +2,13 @@
 
 ## Next Update Queue
 
-### Planned for v2.1.1: Import Preview, Merge Conflict and Automatic Rollback
+ยังไม่ได้กำหนดหัวข้อและหมายเลขเวอร์ชันสำหรับอัปเดตถัดไป
+
+## Deferred
+
+> รายการต่อไปนี้เลื่อนออกไปก่อน โดยยังไม่กำหนดหมายเลขเวอร์ชันหรือกำหนดการใหม่
+
+### Import Preview, Merge Conflict and Automatic Rollback
 
 - แสดง Preview รายการ Instance, Tab และ Favorites ก่อน Import
 - ตรวจชื่อ Instance, Profile Folder, Tab และ Favorites ที่ซ้ำกับข้อมูลในเครื่อง
@@ -11,40 +17,7 @@
 - Rollback ข้อมูลเดิมอัตโนมัติเมื่อ Import หรือการบันทึกล้มเหลว
 - เพิ่ม Import History และรายละเอียดรายการที่เพิ่ม ข้าม รวม หรือย้อนกลับ
 
-### Requested: Close Confirmation
-
-- แสดงหน้าต่างยืนยันเมื่อผู้ใช้กดปุ่ม `X`, `Alt+F4` หรือคำสั่งปิดโปรแกรม
-- ใช้ข้อความ `ต้องการปิด Edge Workspace Manager หรือไม่?`
-- ปุ่มเริ่มต้นเป็น `ไม่ปิด` เพื่อลดโอกาสกด Enter แล้วปิดโดยไม่ตั้งใจ
-- หากเลือก `ปิดโปรแกรม` ให้บันทึก Session, URL และรายการ Tab ก่อนออก
-- หากเลือก `ไม่ปิด` ให้ยกเลิกการปิดและคง WebView, Login และ Session เดิม
-- ไม่แสดงคำถามซ้ำเมื่อโปรแกรมปิดตัวเองเพื่ออัปเดตหรือ Restart ตามกระบวนการภายใน
-- ป้องกัน Dialog ซ้อนหาก Windows ส่งคำสั่งปิดมากกว่าหนึ่งครั้ง
-
-### Close Confirmation Acceptance Criteria
-
-- กด `X` หรือ `Alt+F4` แล้วโปรแกรมต้องไม่ปิดจนกว่าผู้ใช้จะยืนยัน
-- เลือกไม่ปิดแล้ว Tab, URL, Login และหน้าต่างโปรแกรมต้องอยู่ในสถานะเดิม
-- เลือกปิดแล้วข้อมูล Session ล่าสุดต้องถูกบันทึกก่อน Process สิ้นสุด
-- การติดตั้งอัปเดตต้องปิดและเปิดโปรแกรมกลับได้โดยไม่มี Confirmation Dialog ขวาง Updater
-
-### Requested: New Tab Button on the Tab Strip
-
-- แสดงปุ่ม `+` ทางขวาต่อจาก Tab สุดท้ายของ Instance ปัจจุบัน
-- ปุ่มต้องเลื่อนตามตำแหน่งท้ายรายการเมื่อเพิ่ม ปิด Pin หรือสลับลำดับ Tab
-- คลิกแล้วสร้าง Web Tab ใหม่ใน Instance และ WebView2 Profile ปัจจุบัน
-- เปิด Home URL เริ่มต้นตามค่าของ Tab ใหม่โดยไม่ Reload Tab อื่น
-- รองรับ Light/Dark Theme, Thai/English และ Windows Display Scaling
-- มี Tooltip `เปิด Tab ใหม่ (Ctrl+T)` / `New tab (Ctrl+T)` และเข้าถึงได้ด้วย Keyboard
-
-### New Tab Button Acceptance Criteria
-
-- ปุ่ม `+` ต้องอยู่ต่อจาก Tab สุดท้ายและไม่ทับชื่อ Tab หรือปุ่มปิด
-- เมื่อ Tab ล้นพื้นที่ ปุ่มต้องยังเข้าถึงได้หรือเลื่อนไปพร้อมแถบ Tab อย่างถูกต้อง
-- การเปิด Tab ผ่านปุ่มต้องใช้พฤติกรรมเดียวกับ Toolbar และ `Ctrl+T`
-- การเพิ่มปุ่มต้องไม่กระทบการลากเรียง Pin/Unpin หรือ Focused Tab Highlight
-
-### Requested: Incognito Mode
+### Incognito Mode
 
 - เพิ่มคำสั่ง `New Incognito Instance` และ `New Incognito Tab` พร้อมสัญลักษณ์ที่แยกจากโหมดปกติชัดเจน
 - ใช้ WebView2 Profile ชั่วคราวแยกจาก Instance ปกติและไม่ใช้ Cookie, Login หรือ Session ร่วมกัน
@@ -62,7 +35,7 @@
 - หากลบ Profile ชั่วคราวไม่สำเร็จ โปรแกรมต้องบันทึก Cleanup Queue และลองลบใหม่โดยไม่เปิดเผยข้อมูลใน UI
 - การ Update, Crash Recovery และ Close Confirmation ต้องไม่เปลี่ยน Incognito ให้กลายเป็น Session ถาวร
 
-### Requested: Live Theme Switching without Restart
+### Live Theme Switching without Restart
 
 - เปลี่ยน Theme ระหว่าง `Light`, `Dark` และ `Use Windows setting` ได้ทันทีหลังบันทึก Settings
 - อัปเดต Toolbar, Address Bar, Instance/Tab bar, Status bar, Menu, Dialog และหน้าต่าง Browser Tools ที่เปิดอยู่
@@ -80,7 +53,7 @@
 - ไม่มีพื้นหลังหรือข้อความสีเดิมค้างใน Menu, Dialog, Grid หรือ Tab ที่กำลัง Focus
 - การสลับ Theme หลายครั้งติดต่อกันต้องไม่ทำให้ Event ซ้ำ Memory เพิ่มต่อเนื่อง หรือ UI ค้าง
 
-### Planned for v2.2.0: Password-encrypted Full Local Backup (Experimental)
+### Password-encrypted Full Local Backup (Experimental)
 
 - สำรอง Metadata พร้อม WebView2 Profile เป็นตัวเลือกขั้นสูง
 - เข้ารหัส Backup ด้วยรหัสผ่านก่อนบันทึกลงดิสก์
@@ -89,17 +62,48 @@
 - ไม่รวมข้อมูลจาก 1Password และไม่รับประกันว่า Session ที่ผูกกับ Windows หรืออุปกรณ์จะย้ายข้ามเครื่องได้
 - ทำเครื่องหมายเป็น Experimental จนผ่านการทดสอบ Recovery และ Compatibility
 
-## Deferred
-
-### Update Channels and Policy (เดิมวางแผนไว้สำหรับ v2.1.0)
-
-> เลื่อนการพัฒนาออกไปก่อน โดยยังไม่กำหนดหมายเลขเวอร์ชันหรือกำหนดการใหม่
+### Update Channels and Policy
 
 - เพิ่ม Update Channel แบบ `Stable` และ `Beta`
 - ดาวน์โหลดอัปเดตอัตโนมัติเบื้องหลังโดยไม่รบกวนการทำงาน
 - เพิ่ม Critical Update Policy สำหรับอัปเดตความปลอดภัยหรือเวอร์ชันบังคับขั้นต่ำ
 - แจ้งเตือน Critical Update ซ้ำตามนโยบายแม้ผู้ใช้เลือกเตือนภายหลัง
 - รองรับ Minimum Supported Version และการกำหนดนโยบายจาก Update Manifest
+
+## Completed in v2.1.1
+
+### Close Confirmation
+
+- แสดงหน้าต่างยืนยันเมื่อผู้ใช้กดปุ่ม `X`, `Alt+F4` หรือคำสั่งปิดโปรแกรม
+- ใช้ข้อความ `ต้องการปิด Edge Workspace Manager หรือไม่?`
+- ปุ่มเริ่มต้นเป็น `ไม่ปิด` เพื่อลดโอกาสกด Enter แล้วปิดโดยไม่ตั้งใจ
+- หากเลือก `ปิดโปรแกรม` ให้บันทึก Session, URL และรายการ Tab ก่อนออก
+- หากเลือก `ไม่ปิด` ให้ยกเลิกการปิดและคง WebView, Login และ Session เดิม
+- ไม่แสดงคำถามเมื่อโปรแกรมปิดตัวเองเพื่ออัปเดตหรือ Restart ตามกระบวนการภายใน
+- ป้องกัน Confirmation Dialog ซ้อนและไม่ขวาง Windows Shutdown
+
+### Close Confirmation Acceptance Criteria
+
+- กด `X` หรือ `Alt+F4` แล้วโปรแกรมต้องไม่ปิดจนกว่าผู้ใช้จะยืนยัน
+- เลือกไม่ปิดแล้ว Tab, URL, Login และหน้าต่างโปรแกรมต้องอยู่ในสถานะเดิม
+- เลือกปิดแล้วข้อมูล Session ล่าสุดต้องถูกบันทึกก่อน Process สิ้นสุด
+- การติดตั้งอัปเดตต้องปิดและเปิดโปรแกรมกลับได้โดยไม่มี Confirmation Dialog ขวาง Updater
+
+### New Tab Button on the Tab Strip
+
+- แสดงปุ่ม `+` ทางขวาต่อจาก Tab สุดท้ายของทุก Instance
+- ปุ่มเลื่อนตามท้ายรายการเมื่อเพิ่ม ปิด Pin หรือสลับลำดับ Tab
+- คลิกหรือเลือกด้วย Keyboard แล้วสร้าง Web Tab ใหม่ใน Instance และ Profile ปัจจุบัน
+- ใช้เส้นทางเปิด Tab เดียวกับ Toolbar และ `Ctrl+T` โดยไม่ Reload Tab อื่น
+- แสดง Tooltip และ Accessible Name ตามภาษาไทยหรือ English
+- ปุ่ม `+` ไม่ถูกบันทึกใน Workspace, Session, Backup หรือรายการ Recently Closed
+
+### New Tab Button Acceptance Criteria
+
+- ปุ่ม `+` ต้องอยู่ต่อจาก Tab สุดท้ายและไม่ทับชื่อ Tab หรือปุ่มปิด
+- ปุ่มต้องไม่ถูกปิด Pin ทำสำเนา หรือลากสลับกับ Tab จริง
+- `Ctrl+Tab` และ `Ctrl+Shift+Tab` ต้องวนเฉพาะ Tab จริง
+- การเปิด Tab ผ่านปุ่มต้องไม่กระทบการลากเรียง Pin/Unpin หรือ Focused Tab Highlight
 
 ## Completed in v2.1.0
 

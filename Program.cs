@@ -40,7 +40,7 @@ public static class AppInfo
             var value = Assembly.GetExecutingAssembly()
                 .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion
                 ?? Assembly.GetExecutingAssembly().GetName().Version?.ToString(3)
-                ?? "2.1.0";
+                ?? "2.1.1";
             var metadata = value.IndexOf('+');
             return metadata >= 0 ? value[..metadata] : value;
         }
@@ -48,6 +48,13 @@ public static class AppInfo
 
     public static IReadOnlyList<(string Version, string Date, string[] Changes)> ReleaseNotes { get; } =
     [
+        ("2.1.1", "18 กรกฎาคม 2026",
+        [
+            "เพิ่มหน้าต่างยืนยันก่อนปิดโปรแกรมด้วยปุ่ม X หรือ Alt+F4 โดยมีปุ่มไม่ปิดเป็นค่าเริ่มต้น",
+            "บันทึก Session และ Tab ก่อนปิด พร้อมข้ามคำถามเมื่อ Updater เป็นผู้สั่งปิดโปรแกรม",
+            "เพิ่มปุ่ม + ต่อจาก Tab สุดท้ายของแต่ละ Instance สำหรับเปิด Tab ใหม่ได้สะดวก",
+            "ปุ่ม + รองรับ Mouse, Keyboard, Tooltip และไม่รวมใน Session, Backup หรือการลากเรียง Tab"
+        ]),
         ("2.1.0", "18 กรกฎาคม 2026",
         [
             "เพิ่ม Export Metadata สำหรับทุก Instance, Instance ปัจจุบัน หรือ Tab ปัจจุบัน",

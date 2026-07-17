@@ -8,6 +8,7 @@ namespace EdgeWorkspaceManager;
 public sealed class MainForm : Form
 {
     private const int CloseButtonWidth = 22;
+    private static readonly object NewTabButtonTag = new();
     private WorkspaceConfig _config = ConfigStore.Load();
     private readonly TabControl _workspaceTabs = new() { Dock = DockStyle.Fill };
     private readonly TextBox _address = new() { Dock = DockStyle.Fill };
@@ -34,6 +35,8 @@ public sealed class MainForm : Form
     private Button? _pinTabButton;
     private readonly ToolTip _pinTabToolTip = new();
     private bool _isReloading;
+    private bool _allowCloseWithoutConfirmation;
+    private bool _closeConfirmationOpen;
 
     public MainForm()
     {
@@ -58,7 +61,40 @@ public sealed class MainForm : Form
         _awakeTimer.Tick += (_, _) => { CheckAwakeTimeout(); CheckSystemTheme(); };
         _awakeTimer.Start();
         _suggestionTimer.Tick += (_, _) => { _suggestionTimer.Stop(); UpdateAddressSuggestions(); };
-        FormClosing += (_, _) => { _powerAwake.Dispose(); SaveSession(); };
+        FormClosing += MainFormClosing;
+    }
+
+    private void MainFormClosing(object? sender, FormClosingEventArgs e)
+    {
+        if (!_allowCloseWithoutConfirmation && e.CloseReason == CloseReason.UserClosing)
+        {
+            if (_closeConfirmationOpen)
+            {
+                e.Cancel = true;
+                return;
+            }
+            _closeConfirmationOpen = true;
+            try
+            {
+                var answer = MessageBox.Show(this,
+                    L.T("ต้องการปิด Edge Workspace Manager หรือไม่?", "Do you want to close Edge Workspace Manager?"),
+                    L.T("ยืนยันการปิดโปรแกรม", "Confirm close"),
+                    MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2);
+                if (answer != DialogResult.Yes)
+                {
+                    e.Cancel = true;
+                    return;
+                }
+                _allowCloseWithoutConfirmation = true;
+            }
+            finally
+            {
+                _closeConfirmationOpen = false;
+            }
+        }
+        if (e.Cancel) return;
+        SaveSession();
+        _powerAwake.Dispose();
     }
 
     private void BuildLayout()
@@ -196,6 +232,7 @@ public sealed class MainForm : Form
                     SaveSession();
                     AddUpdateHistory(update.Version, "Installing", L.T("ดาวน์โหลดและตรวจสอบไฟล์แล้ว", "Package downloaded and verified"));
                     UpdateService.LaunchUpdater(download.StagingPath, update.Version);
+                    _allowCloseWithoutConfirmation = true;
                     Close();
                 }
                 else AddUpdateHistory(update.Version, "Failed", download.FailureMessage ??
@@ -295,6 +332,7 @@ public sealed class MainForm : Form
                 if (!_config.RestoreLastSession) tabs = workspace.Tabs.OrderByDescending(tab => tab.IsPinned).ToList();
                 foreach (var tab in tabs)
                     await CreateBrowserTabPageAsync(inner, workspace, tab, false);
+                EnsureNewTabButton(inner);
             }
             _status.Text = "พร้อมใช้งาน";
             SyncAddress();
@@ -330,6 +368,14 @@ public sealed class MainForm : Form
             _addressUserEditing = false;
             SyncAddress();
         };
+        inner.KeyDown += (_, e) =>
+        {
+            if (!ReferenceEquals(inner.SelectedTab?.Tag, NewTabButtonTag) ||
+                (e.KeyCode != Keys.Enter && e.KeyCode != Keys.Space)) return;
+            e.Handled = true;
+            e.SuppressKeyPress = true;
+            _ = AddNewTabAsync();
+        };
         return inner;
     }
 
@@ -339,7 +385,7 @@ public sealed class MainForm : Form
         var page = new TabPage { Tag = tab };
         UpdateBrowserTabCaption(page, tab);
         page.ContextMenuStrip = BuildBrowserTabMenu(inner, page);
-        inner.TabPages.Add(page);
+        InsertBeforeNewTabButton(inner, page);
         if (select) inner.SelectedTab = page;
         await AddBrowserAsync(page, workspace, tab);
         return page;
@@ -415,6 +461,35 @@ public sealed class MainForm : Form
         ConfigStore.Save(_config);
         _address.Focus();
         _address.SelectAll();
+    }
+
+    private void EnsureNewTabButton(TabControl inner)
+    {
+        var button = inner.TabPages.Cast<TabPage>()
+            .FirstOrDefault(page => ReferenceEquals(page.Tag, NewTabButtonTag));
+        if (button is null)
+        {
+            button = new TabPage("+")
+            {
+                Tag = NewTabButtonTag,
+                ToolTipText = L.T("เปิด Tab ใหม่ (Ctrl+T)", "New tab (Ctrl+T)"),
+                AccessibleName = L.T("เปิด Tab ใหม่", "New tab")
+            };
+            inner.TabPages.Add(button);
+        }
+        else if (inner.TabPages.IndexOf(button) != inner.TabCount - 1)
+        {
+            inner.TabPages.Remove(button);
+            inner.TabPages.Add(button);
+        }
+    }
+
+    private static void InsertBeforeNewTabButton(TabControl inner, TabPage page)
+    {
+        var buttonIndex = inner.TabPages.Cast<TabPage>().ToList()
+            .FindIndex(item => ReferenceEquals(item.Tag, NewTabButtonTag));
+        if (buttonIndex < 0) inner.TabPages.Add(page);
+        else inner.TabPages.Insert(buttonIndex, page);
     }
 
     private void CloseTab(TabControl inner, TabPage page, bool remember = true)
@@ -546,6 +621,7 @@ public sealed class MainForm : Form
         var sourceUiIndex = inner.TabPages.IndexOf(sourcePage);
         var target = source.IsPinned ? pinnedCount : Math.Max(pinnedCount, sourceUiIndex + 1);
         inner.TabPages.Insert(Math.Min(target, inner.TabCount), duplicatePage);
+        EnsureNewTabButton(inner);
         inner.SelectedTab = duplicatePage;
         PersistBrowserTabOrder(inner);
         _status.Text = L.T("ทำสำเนา Tab แล้ว", "Tab duplicated");
@@ -555,6 +631,15 @@ public sealed class MainForm : Form
     {
         if (sender is not TabControl tabs || e.Index < 0) return;
         var bounds = e.Bounds;
+        if (ReferenceEquals(tabs.TabPages[e.Index].Tag, NewTabButtonTag))
+        {
+            using var buttonBackground = new SolidBrush(ThemeManager.ControlBack);
+            e.Graphics.FillRectangle(buttonBackground, bounds);
+            using var plusFont = new Font(Font.FontFamily, 15F, FontStyle.Regular);
+            TextRenderer.DrawText(e.Graphics, "+", plusFont, bounds,
+                ThemeManager.Foreground, TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter);
+            return;
+        }
         var selected = e.Index == tabs.SelectedIndex;
         var backgroundColor = selected ? ParseColor(_config.Settings.FocusedTabColorHex, Color.FromArgb(0, 120, 212)) : ThemeManager.ControlBack;
         var foregroundColor = selected && backgroundColor.GetBrightness() < 0.55f ? Color.White : ThemeManager.Foreground;
@@ -584,6 +669,15 @@ public sealed class MainForm : Form
         for (var i = 0; i < tabs.TabCount; i++)
         {
             var bounds = tabs.GetTabRect(i);
+            if (ReferenceEquals(tabs.TabPages[i].Tag, NewTabButtonTag))
+            {
+                if (e.Button == MouseButtons.Left && bounds.Contains(e.Location))
+                {
+                    _ = AddNewTabAsync();
+                    return;
+                }
+                continue;
+            }
             var pinned = tabs.TabPages[i].Tag is BrowserTab { IsPinned: true };
             if ((e.Button == MouseButtons.Left && !pinned && CloseButtonBounds(bounds).Contains(e.Location)) ||
                 (e.Button == MouseButtons.Middle && bounds.Contains(e.Location)))
@@ -600,6 +694,7 @@ public sealed class MainForm : Form
     {
         if (sender is not TabControl tabs || e.Button != MouseButtons.Left ||
             !_tabDragStart.TryGetValue(tabs, out var index) || index < 0 || index >= tabs.TabCount) return;
+        if (ReferenceEquals(tabs.TabPages[index].Tag, NewTabButtonTag)) return;
         _tabDragStart[tabs] = -1;
         tabs.DoDragDrop(tabs.TabPages[index], DragDropEffects.Move);
     }
@@ -612,18 +707,21 @@ public sealed class MainForm : Form
 
     private void BrowserTabsDragDrop(object? sender, DragEventArgs e)
     {
-        if (sender is not TabControl tabs || e.Data?.GetData(typeof(TabPage)) is not TabPage page || !tabs.TabPages.Contains(page)) return;
+        if (sender is not TabControl tabs || e.Data?.GetData(typeof(TabPage)) is not TabPage page ||
+            !tabs.TabPages.Contains(page) || ReferenceEquals(page.Tag, NewTabButtonTag)) return;
         var point = tabs.PointToClient(new Point(e.X, e.Y));
-        var target = tabs.TabCount - 1;
+        var realTabCount = tabs.TabPages.Cast<TabPage>().Count(item => !ReferenceEquals(item.Tag, NewTabButtonTag));
+        var target = Math.Max(0, realTabCount - 1);
         for (var i = 0; i < tabs.TabCount; i++)
-            if (tabs.GetTabRect(i).Contains(point)) { target = i; break; }
+            if (!ReferenceEquals(tabs.TabPages[i].Tag, NewTabButtonTag) && tabs.GetTabRect(i).Contains(point)) { target = i; break; }
         var source = tabs.TabPages.IndexOf(page);
         var pinnedCount = tabs.TabPages.Cast<TabPage>().Count(p => p.Tag is BrowserTab { IsPinned: true });
         var isPinned = page.Tag is BrowserTab { IsPinned: true };
-        target = isPinned ? Math.Clamp(target, 0, Math.Max(0, pinnedCount - 1)) : Math.Clamp(target, pinnedCount, tabs.TabCount - 1);
+        target = isPinned ? Math.Clamp(target, 0, Math.Max(0, pinnedCount - 1)) : Math.Clamp(target, pinnedCount, Math.Max(pinnedCount, realTabCount - 1));
         if (source == target) return;
         tabs.TabPages.Remove(page);
         tabs.TabPages.Insert(target, page);
+        EnsureNewTabButton(tabs);
         tabs.SelectedTab = page;
         PersistBrowserTabOrder(tabs);
     }
@@ -1146,8 +1244,13 @@ public sealed class MainForm : Form
     private void SelectRelativeTab(int offset)
     {
         var inner = CurrentInnerTabs();
-        if (inner is null || inner.TabCount == 0) return;
-        inner.SelectedIndex = (inner.SelectedIndex + offset + inner.TabCount) % inner.TabCount;
+        if (inner is null) return;
+        var pages = inner.TabPages.Cast<TabPage>()
+            .Where(page => !ReferenceEquals(page.Tag, NewTabButtonTag)).ToList();
+        if (pages.Count == 0) return;
+        var current = pages.IndexOf(inner.SelectedTab!);
+        var target = (Math.Max(0, current) + offset + pages.Count) % pages.Count;
+        inner.SelectedTab = pages[target];
     }
 
     private void GoBack() { var browser = CurrentWebView(); if (browser?.CanGoBack == true) browser.GoBack(); }
@@ -1490,7 +1593,7 @@ public sealed class MainForm : Form
         var page = new TabPage(ShortTitle(title));
         var host = new ExternalWindowHost();
         page.Controls.Add(host);
-        inner.TabPages.Add(page);
+        InsertBeforeNewTabButton(inner, page);
         inner.SelectedTab = page;
         if (!host.Attach(handle))
         {
