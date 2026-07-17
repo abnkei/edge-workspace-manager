@@ -15,7 +15,7 @@ if errorlevel 1 goto :dotnet8_missing
 dotnet restore
 if errorlevel 1 goto :error
 
-set "APP_VERSION=2.0.0"
+set "APP_VERSION=2.1.0"
 set "RELEASE_DIR=%~dp0releases\v%APP_VERSION%"
 
 dotnet publish -c Release -r win-x64 --self-contained true /p:PublishSingleFile=true /p:IncludeNativeLibrariesForSelfExtract=true -o "%RELEASE_DIR%"

@@ -40,7 +40,7 @@ public static class AppInfo
             var value = Assembly.GetExecutingAssembly()
                 .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion
                 ?? Assembly.GetExecutingAssembly().GetName().Version?.ToString(3)
-                ?? "2.0.0";
+                ?? "2.1.0";
             var metadata = value.IndexOf('+');
             return metadata >= 0 ? value[..metadata] : value;
         }
@@ -48,6 +48,14 @@ public static class AppInfo
 
     public static IReadOnlyList<(string Version, string Date, string[] Changes)> ReleaseNotes { get; } =
     [
+        ("2.1.0", "18 กรกฎาคม 2026",
+        [
+            "เพิ่ม Export Metadata สำหรับทุก Instance, Instance ปัจจุบัน หรือ Tab ปัจจุบัน",
+            "สำรองชื่อ สี ลำดับ Tab, URL ปัจจุบัน, สถานะ Pin และ Favorites เป็นไฟล์ .ewmbackup",
+            "เพิ่ม Import แบบสร้าง Instance และ WebView2 Profile ใหม่โดยไม่เขียนทับข้อมูลเดิม",
+            "ตรวจ Manifest, จำนวนรายการ และ SHA-256 ก่อนนำเข้าข้อมูล",
+            "ไม่รวม Cookie, Login, Password, History, Download และ WebView2 Profile ใน Metadata Backup"
+        ]),
         ("2.0.0", "18 กรกฎาคม 2026",
         [
             "เพิ่ม Recovery Backup และ Journal ก่อนติดตั้งไฟล์อัปเดต",

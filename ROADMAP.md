@@ -2,7 +2,29 @@
 
 ## Next Update Queue
 
-### Planned for v2.1.0: Update Channels and Policy
+### Planned for v2.1.1: Import Preview, Merge Conflict and Automatic Rollback
+
+- แสดง Preview รายการ Instance, Tab และ Favorites ก่อน Import
+- ตรวจชื่อ Instance, Profile Folder, Tab และ Favorites ที่ซ้ำกับข้อมูลในเครื่อง
+- เลือกวิธีจัดการ Conflict แบบ Import as new, Merge หรือ Replace รายการที่เลือก
+- สำรอง Local Config อัตโนมัติก่อน Import
+- Rollback ข้อมูลเดิมอัตโนมัติเมื่อ Import หรือการบันทึกล้มเหลว
+- เพิ่ม Import History และรายละเอียดรายการที่เพิ่ม ข้าม รวม หรือย้อนกลับ
+
+### Planned for v2.2.0: Password-encrypted Full Local Backup (Experimental)
+
+- สำรอง Metadata พร้อม WebView2 Profile เป็นตัวเลือกขั้นสูง
+- เข้ารหัส Backup ด้วยรหัสผ่านก่อนบันทึกลงดิสก์
+- ปิด WebView2 อย่างปลอดภัยก่อนสำรองและตรวจว่าไม่มีไฟล์ Profile ถูกใช้งาน
+- แสดงคำเตือนว่า Backup อาจมี Cookie, Login Token และข้อมูล Session ที่ละเอียดอ่อน
+- ไม่รวมข้อมูลจาก 1Password และไม่รับประกันว่า Session ที่ผูกกับ Windows หรืออุปกรณ์จะย้ายข้ามเครื่องได้
+- ทำเครื่องหมายเป็น Experimental จนผ่านการทดสอบ Recovery และ Compatibility
+
+## Deferred
+
+### Update Channels and Policy (เดิมวางแผนไว้สำหรับ v2.1.0)
+
+> เลื่อนการพัฒนาออกไปก่อน โดยยังไม่กำหนดหมายเลขเวอร์ชันหรือกำหนดการใหม่
 
 - เพิ่ม Update Channel แบบ `Stable` และ `Beta`
 - ดาวน์โหลดอัปเดตอัตโนมัติเบื้องหลังโดยไม่รบกวนการทำงาน
@@ -10,7 +32,27 @@
 - แจ้งเตือน Critical Update ซ้ำตามนโยบายแม้ผู้ใช้เลือกเตือนภายหลัง
 - รองรับ Minimum Supported Version และการกำหนดนโยบายจาก Update Manifest
 
-### Long-term Direction: Cross-device Sync
+## Completed in v2.1.0
+
+### Export/Import Instance, Tab and Favorites Metadata
+
+- Export ทุก Instance, Instance ปัจจุบัน หรือ Tab ปัจจุบันเป็นไฟล์ `.ewmbackup`
+- สำรองชื่อ สี ลำดับ Instance/Tab, Home URL, URL ปัจจุบัน, สถานะเปิด และสถานะ Pin
+- Export Favorites ที่สัมพันธ์กับขอบเขตข้อมูลที่เลือก
+- เก็บ `manifest.json` และ `metadata.json` ใน Package เดียว
+- ตรวจ Product, Backup Format Version, จำนวนรายการ และ SHA-256 ก่อน Import
+- Import เป็น Instance, Tab ID และ Profile Folder ใหม่โดยไม่เขียนทับข้อมูลเดิม
+- ไม่ Export Cookie, Login, Password, History, Download, Update History หรือ WebView2 Profile
+
+### Metadata Backup Acceptance Criteria
+
+- Export แล้ว Import กลับต้องได้ชื่อ สี ลำดับ URL และสถานะ Pin เหมือนข้อมูลต้นฉบับ
+- Import ต้องไม่ลบหรือเขียนทับ Instance, Tab, Favorites หรือ Profile ที่มีอยู่
+- ไฟล์ที่ Manifest, จำนวนรายการ หรือ SHA-256 ไม่ถูกต้องต้องถูกปฏิเสธ
+- ผู้ใช้ต้องได้รับแจ้งชัดเจนว่า Metadata Backup ไม่รวม Login, Cookie หรือข้อมูลจาก 1Password
+- ไฟล์จาก Instance หนึ่งต้องย้ายไปอีกเครื่องได้โดยไม่อ้างอิง Path เฉพาะเครื่องเดิม
+
+## Long-term Direction: Cross-device Sync
 
 > ยังไม่อยู่ในขอบเขตการพัฒนาระยะสั้น เก็บไว้เป็นแนวทางหลังจากระบบ Public Update มีความเสถียรแล้ว
 

@@ -842,6 +842,17 @@ public sealed class MainForm : Form
         menu.Items.Add("History", null, (_, _) => ShowBrowserTools(1));
         menu.Items.Add("Downloads", null, (_, _) => ShowBrowserTools(2));
         menu.Items.Add("Settings", null, (_, _) => ShowBrowserTools(3));
+        var backup = new ToolStripMenuItem(L.T("สำรองและย้ายข้อมูล", "Backup and transfer"));
+        backup.DropDownItems.Add(L.T("Export ทุก Instance", "Export all instances"), null,
+            (_, _) => ExportMetadataBackup(BackupExportScope.All));
+        backup.DropDownItems.Add(L.T("Export Instance ปัจจุบัน", "Export current instance"), null,
+            (_, _) => ExportMetadataBackup(BackupExportScope.CurrentWorkspace));
+        backup.DropDownItems.Add(L.T("Export Tab ปัจจุบัน", "Export current tab"), null,
+            (_, _) => ExportMetadataBackup(BackupExportScope.CurrentTab));
+        backup.DropDownItems.Add(new ToolStripSeparator());
+        backup.DropDownItems.Add(L.T("Import จากไฟล์ Backup", "Import from backup"), null,
+            (_, _) => ImportMetadataBackup());
+        menu.Items.Add(backup);
         menu.Items.Add(new ToolStripSeparator());
         menu.Items.Add(L.T("ค้นหาในหน้า   Ctrl+F", "Find in page   Ctrl+F"), null, (_, _) => ShowFindBar());
         menu.Items.Add("Zoom In   Ctrl++", null, (_, _) => ChangeZoom(0.1));
@@ -860,6 +871,134 @@ public sealed class MainForm : Form
         ThemeManager.Apply(menu);
         menu.Show(Cursor.Position);
     }
+
+    private void ExportMetadataBackup(BackupExportScope scope)
+    {
+        SaveSession();
+        var currentWorkspace = CurrentWorkspace();
+        var currentTab = CurrentTab();
+        List<BrowserWorkspace> workspaces;
+        List<FavoriteItem> favorites;
+        switch (scope)
+        {
+            case BackupExportScope.CurrentWorkspace when currentWorkspace is not null:
+                workspaces = [currentWorkspace];
+                favorites = _config.Favorites.Where(item => item.WorkspaceId == currentWorkspace.Id).ToList();
+                break;
+            case BackupExportScope.CurrentTab when currentWorkspace is not null && currentTab is not null:
+                workspaces =
+                [
+                    new BrowserWorkspace
+                    {
+                        Id = currentWorkspace.Id,
+                        Name = currentWorkspace.Name,
+                        ProfileFolder = currentWorkspace.ProfileFolder,
+                        ColorHex = currentWorkspace.ColorHex,
+                        Tabs = [CloneTab(currentTab)]
+                    }
+                ];
+                favorites = _config.Favorites.Where(item =>
+                    item.WorkspaceId == currentWorkspace.Id &&
+                    string.Equals(item.Url.TrimEnd('/'), (currentTab.CurrentUrl ?? currentTab.Url).TrimEnd('/'),
+                        StringComparison.OrdinalIgnoreCase)).ToList();
+                break;
+            case BackupExportScope.All:
+                workspaces = _config.Workspaces.ToList();
+                favorites = _config.Favorites.ToList();
+                break;
+            default:
+                MessageBox.Show(L.T("ไม่มี Instance หรือ Tab ที่เลือก", "No instance or tab is selected."),
+                    L.T("Export Backup", "Export backup"), MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+        }
+
+        using var dialog = new SaveFileDialog
+        {
+            Title = L.T("บันทึกไฟล์ Backup", "Save backup file"),
+            Filter = "Edge Workspace Manager Backup (*.ewmbackup)|*.ewmbackup",
+            DefaultExt = "ewmbackup",
+            AddExtension = true,
+            FileName = $"EdgeWorkspaceManager-{DateTime.Now:yyyyMMdd-HHmm}.ewmbackup"
+        };
+        if (dialog.ShowDialog(this) != DialogResult.OK) return;
+        try
+        {
+            MetadataBackupService.Export(dialog.FileName, workspaces, favorites);
+            _status.Text = L.T("Export Backup สำเร็จ", "Backup exported successfully");
+            MessageBox.Show(L.T(
+                    $"Export สำเร็จ\r\n\r\nInstance: {workspaces.Count}\r\nTab: {workspaces.Sum(item => item.Tabs.Count)}\r\nFavorites: {favorites.Count}\r\n\r\nไฟล์นี้ไม่รวม Cookie, Login, Password หรือ WebView2 Profile",
+                    $"Export completed.\r\n\r\nInstances: {workspaces.Count}\r\nTabs: {workspaces.Sum(item => item.Tabs.Count)}\r\nFavorites: {favorites.Count}\r\n\r\nThis file does not include cookies, logins, passwords, or WebView2 profiles."),
+                L.T("Export Backup", "Export backup"), MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(L.T($"Export ไม่สำเร็จ\r\n\r\n{ex.Message}", $"Export failed.\r\n\r\n{ex.Message}"),
+                L.T("Export Backup", "Export backup"), MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+    }
+
+    private void ImportMetadataBackup()
+    {
+        using var dialog = new OpenFileDialog
+        {
+            Title = L.T("เลือกไฟล์ Backup", "Select a backup file"),
+            Filter = "Edge Workspace Manager Backup (*.ewmbackup)|*.ewmbackup",
+            CheckFileExists = true,
+            Multiselect = false
+        };
+        if (dialog.ShowDialog(this) != DialogResult.OK) return;
+        try
+        {
+            var imported = MetadataBackupService.Import(dialog.FileName);
+            var answer = MessageBox.Show(L.T(
+                    $"นำเข้าข้อมูลจาก Edge Workspace Manager {imported.Manifest.AppVersion}\r\n\r\nInstance: {imported.Manifest.InstanceCount}\r\nTab: {imported.Manifest.TabCount}\r\nFavorites: {imported.Manifest.FavoriteCount}\r\n\r\nข้อมูลจะถูกสร้างเป็น Instance ใหม่ และไม่เขียนทับข้อมูลเดิม ต้องการดำเนินการต่อหรือไม่?",
+                    $"Import data from Edge Workspace Manager {imported.Manifest.AppVersion}\r\n\r\nInstances: {imported.Manifest.InstanceCount}\r\nTabs: {imported.Manifest.TabCount}\r\nFavorites: {imported.Manifest.FavoriteCount}\r\n\r\nThe data will be created as new instances and will not replace existing data. Continue?"),
+                L.T("Import Backup", "Import backup"), MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (answer != DialogResult.Yes) return;
+
+            SaveSession();
+            foreach (var workspace in imported.Workspaces)
+            {
+                workspace.Name = UniqueImportedWorkspaceName(workspace.Name);
+                workspace.ProfileFolder = UniqueImportedProfileFolder(workspace.ProfileFolder);
+                _config.Workspaces.Add(workspace);
+                _config.OpenTabIdsByWorkspace[workspace.Id] = workspace.Tabs
+                    .Where(tab => tab.IsOpen).Select(tab => tab.Id).ToList();
+            }
+            _config.Favorites.AddRange(imported.Favorites);
+            SaveAndReload();
+            _status.Text = L.T("Import Backup สำเร็จ", "Backup imported successfully");
+            MessageBox.Show(L.T(
+                    "Import สำเร็จ ข้อมูลถูกเพิ่มเป็น Instance ใหม่\r\n\r\nกรุณา Login เว็บไซต์อีกครั้ง เนื่องจาก Metadata Backup ไม่รวม Cookie หรือ Login",
+                    "Import completed. The data was added as new instances.\r\n\r\nPlease sign in to websites again because metadata backups do not contain cookies or login data."),
+                L.T("Import Backup", "Import backup"), MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(L.T($"Import ไม่สำเร็จ\r\n\r\n{ex.Message}", $"Import failed.\r\n\r\n{ex.Message}"),
+                L.T("Import Backup", "Import backup"), MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+    }
+
+    private string UniqueImportedWorkspaceName(string source)
+    {
+        var baseName = string.IsNullOrWhiteSpace(source) ? L.T("Instance ที่นำเข้า", "Imported instance") : source.Trim();
+        var candidate = baseName;
+        for (var suffix = 2; _config.Workspaces.Any(item => string.Equals(item.Name, candidate, StringComparison.OrdinalIgnoreCase)); suffix++)
+            candidate = $"{baseName} ({suffix})";
+        return candidate;
+    }
+
+    private string UniqueImportedProfileFolder(string source)
+    {
+        var baseName = Sanitize(string.IsNullOrWhiteSpace(source) ? "Imported" : source) + "-Imported";
+        var candidate = baseName;
+        for (var suffix = 2; _config.Workspaces.Any(item => string.Equals(item.ProfileFolder, candidate, StringComparison.OrdinalIgnoreCase)); suffix++)
+            candidate = $"{baseName}-{suffix}";
+        return candidate;
+    }
+
+    private enum BackupExportScope { All, CurrentWorkspace, CurrentTab }
 
     private ToolStripMenuItem BuildAwakeMenu(string title, bool keepDisplayOn)
     {
