@@ -22,7 +22,7 @@ public static class AppInfo
             var value = Assembly.GetExecutingAssembly()
                 .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion
                 ?? Assembly.GetExecutingAssembly().GetName().Version?.ToString(3)
-                ?? "1.7.2";
+                ?? "1.7.3";
             var metadata = value.IndexOf('+');
             return metadata >= 0 ? value[..metadata] : value;
         }
@@ -30,6 +30,12 @@ public static class AppInfo
 
     public static IReadOnlyList<(string Version, string Date, string[] Changes)> ReleaseNotes { get; } =
     [
+        ("1.7.3", "17 กรกฎาคม 2026",
+        [
+            "Test Release สำหรับทดสอบ Auto Update จาก v1.7.2 แบบครบวงจร",
+            "ตรวจการแจ้งเตือน ดาวน์โหลด SHA-256 Updater และการเปิดกลับ",
+            "ตรวจการรักษา Tab, Instance, Login, Cookie และ Session หลังอัปเดต"
+        ]),
         ("1.7.2", "17 กรกฎาคม 2026",
         [
             "แก้การตรวจอัปเดตที่เปรียบเทียบเวอร์ชันผิดเมื่อมี Git commit metadata",
