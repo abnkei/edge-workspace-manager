@@ -1,0 +1,18 @@
+{
+  "version": "1.7.0",
+  "releaseDate": "2026-07-17T00:00:00Z",
+  "downloadUrl": "https://github.com/abnkei/edge-workspace-manager/releases/latest/download/EdgeWorkspaceManager-win-x64.zip",
+  "sha256": "GENERATED_BY_GITHUB_ACTIONS",
+  "size": 0,
+  "priority": "recommended",
+  "releaseNotesTh": [
+    "เพิ่มระบบ Official Public Update ผ่าน GitHub Releases",
+    "เพิ่ม Update now, Remind me later และ Skip this version",
+    "เพิ่มการตรวจ SHA-256 และ Update History"
+  ],
+  "releaseNotesEn": [
+    "Added Official Public Update through GitHub Releases",
+    "Added Update now, Remind me later, and Skip this version",
+    "Added SHA-256 verification and Update History"
+  ]
+}

@@ -1,0 +1,11 @@
+bin/
+obj/
+releases/
+Updater/bin/
+Updater/obj/
+.vs/
+*.user
+*.suo
+*.log
+TestResults/
+.agents/
