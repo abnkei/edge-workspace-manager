@@ -10,8 +10,8 @@ public sealed class AboutForm : Form
     {
         Text = "About Edge Workspace Manager";
         StartPosition = FormStartPosition.CenterParent;
-        ClientSize = new Size(620, 470);
-        MinimumSize = new Size(560, 450);
+        ClientSize = new Size(620, 500);
+        MinimumSize = new Size(560, 480);
         Font = new Font("Segoe UI", 10F);
 
         var root = new TableLayoutPanel
@@ -43,6 +43,7 @@ public sealed class AboutForm : Form
         AddLinkRow(details, 6, "Latest release", "View releases", RepositoryUrl + "/releases");
         AddLinkRow(details, 7, "Support", "Report an issue", RepositoryUrl + "/issues/new");
         AddDocumentRow(details, 8, "Licenses", "Third-party notices", "THIRD-PARTY-NOTICES.md");
+        AddLinkRow(details, 9, "Commercial license", "Contact licensing", "mailto:abnkei@gmail.com?subject=Edge%20Workspace%20Manager%20Commercial%20License");
         root.Controls.Add(details, 0, 1);
 
         var buttons = new FlowLayoutPanel
@@ -89,12 +90,12 @@ public sealed class AboutForm : Form
             Dock = DockStyle.Top,
             AutoSize = true,
             ColumnCount = 2,
-            RowCount = 9,
+            RowCount = 10,
             Margin = new Padding(0)
         };
         table.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 170));
         table.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
-        for (var row = 0; row < 9; row++)
+        for (var row = 0; row < 10; row++)
             table.RowStyles.Add(new RowStyle(SizeType.Absolute, row == 3 ? 22 : 34));
         return table;
     }

@@ -6,8 +6,11 @@ namespace EdgeWorkspaceManager;
 internal static class Program
 {
     [STAThread]
-    static void Main()
+    static void Main(string[] args)
     {
+        for (var index = 0; index + 1 < args.Length; index += 2)
+            if (string.Equals(args[index], "--update-health", StringComparison.OrdinalIgnoreCase))
+                AppInfo.UpdateHealthPath = args[index + 1];
         ApplicationConfiguration.Initialize();
         Application.Run(new MainForm());
     }
@@ -15,6 +18,8 @@ internal static class Program
 
 public static class AppInfo
 {
+    public static string? UpdateHealthPath { get; internal set; }
+
     public static string BuildCommit
     {
         get
@@ -35,7 +40,7 @@ public static class AppInfo
             var value = Assembly.GetExecutingAssembly()
                 .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion
                 ?? Assembly.GetExecutingAssembly().GetName().Version?.ToString(3)
-                ?? "1.7.4";
+                ?? "2.0.0";
             var metadata = value.IndexOf('+');
             return metadata >= 0 ? value[..metadata] : value;
         }
@@ -43,6 +48,14 @@ public static class AppInfo
 
     public static IReadOnlyList<(string Version, string Date, string[] Changes)> ReleaseNotes { get; } =
     [
+        ("2.0.0", "18 กรกฎาคม 2026",
+        [
+            "เพิ่ม Recovery Backup และ Journal ก่อนติดตั้งไฟล์อัปเดต",
+            "เพิ่ม Startup Health Check และ Rollback อัตโนมัติเมื่อเวอร์ชันใหม่เปิดไม่สำเร็จ",
+            "เพิ่ม Retry, ตรวจพื้นที่ว่าง, ตรวจขนาดไฟล์ และข้อความ Error ที่เข้าใจง่าย",
+            "เพิ่ม Update Log พร้อมสถานะ Installed, RolledBack และ RollbackFailed ใน Update History",
+            "เริ่มใช้ Edge Workspace Manager Community License 1.0 พร้อม CLA และ Commercial License"
+        ]),
         ("1.7.4", "17 กรกฎาคม 2026",
         [
             "แก้ Address Bar ให้แสดง URL ปัจจุบันหลัง Redirect, SPA และ Back/Forward",

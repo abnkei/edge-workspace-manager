@@ -1,8 +1,9 @@
 # Third-Party Notices
 
-Edge Workspace Manager is licensed separately under the MIT License in the
-`LICENSE` file. The notices below apply only to the identified third-party
-components and do not change the license of Edge Workspace Manager.
+Edge Workspace Manager is licensed separately under the Edge Workspace Manager
+Community License 1.0 in the `LICENSE` file. The notices below apply only to
+the identified third-party components and do not change the license of Edge
+Workspace Manager.
 
 ## Microsoft Edge WebView2 SDK
 
@@ -49,8 +50,9 @@ endorse or promote derived products without prior written permission.
 ## Microsoft Edge WebView2 Runtime
 
 The Evergreen WebView2 Runtime is installed and serviced separately by
-Microsoft; it is not relicensed under the Edge Workspace Manager MIT License.
-Use and redistribution are subject to the Microsoft WebView2 Runtime terms.
+Microsoft; it is not relicensed under the Edge Workspace Manager Community
+License. Use and redistribution are subject to the Microsoft WebView2 Runtime
+terms.
 
 - Runtime distribution documentation:
   <https://learn.microsoft.com/microsoft-edge/webview2/concepts/distribution>

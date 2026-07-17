@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 namespace EdgeWorkspaceManager;
 
 public enum UpdateChoice { None, UpdateNow, RemindLater, SkipVersion }
@@ -48,6 +50,7 @@ public sealed class UpdateDownloadForm : Form
     private readonly ProgressBar _progress = new() { Dock = DockStyle.Top, Height = 26 };
     private readonly Label _message = new() { Dock = DockStyle.Fill, TextAlign = ContentAlignment.MiddleLeft };
     public string? StagingPath { get; private set; }
+    public string? FailureMessage { get; private set; }
 
     public UpdateDownloadForm(UpdateService service, UpdateManifest update)
     {
@@ -64,16 +67,27 @@ public sealed class UpdateDownloadForm : Form
         Controls.Add(panel);
         Shown += async (_, _) =>
         {
-            try
+            while (true)
             {
-                var progress = new Progress<UpdateProgress>(p => { _progress.Value = p.Percentage; _message.Text = p.Message; });
-                StagingPath = await service.DownloadAndStageAsync(update, progress);
-                DialogResult = DialogResult.OK;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(this, ex.Message, L.T("อัปเดตไม่สำเร็จ", "Update failed"), MessageBoxButtons.OK, MessageBoxIcon.Error);
-                DialogResult = DialogResult.Abort;
+                try
+                {
+                    _progress.Value = 0;
+                    var progress = new Progress<UpdateProgress>(p => { _progress.Value = p.Percentage; _message.Text = p.Message; });
+                    StagingPath = await service.DownloadAndStageAsync(update, progress);
+                    DialogResult = DialogResult.OK;
+                    break;
+                }
+                catch (Exception ex)
+                {
+                    UpdateService.WriteLog($"Download or staging failed for {update.Version}: {ex}");
+                    FailureMessage = UpdateService.FriendlyError(ex);
+                    var choice = MessageBox.Show(this,
+                        $"{FailureMessage}\r\n\r\n{L.T("ต้องการลองใหม่หรือไม่?", "Would you like to retry?")}",
+                        L.T("อัปเดตไม่สำเร็จ", "Update failed"), MessageBoxButtons.RetryCancel, MessageBoxIcon.Error);
+                    if (choice == DialogResult.Retry) continue;
+                    DialogResult = DialogResult.Abort;
+                    break;
+                }
             }
             Close();
         };
@@ -88,13 +102,37 @@ public sealed class UpdateHistoryForm : Form
         Text = L.T("ประวัติการอัปเดต", "Update history");
         StartPosition = FormStartPosition.CenterParent;
         Size = new Size(760, 460);
+        var root = new TableLayoutPanel { Dock = DockStyle.Fill, RowCount = 2, ColumnCount = 1, Padding = new Padding(10) };
+        root.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
+        root.RowStyles.Add(new RowStyle(SizeType.Absolute, 46));
         var grid = new DataGridView { Dock = DockStyle.Fill, ReadOnly = true, AllowUserToAddRows = false, RowHeadersVisible = false, AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill };
         grid.Columns.Add("Version", L.T("เวอร์ชัน", "Version"));
         grid.Columns.Add("Date", L.T("วันที่", "Date"));
         grid.Columns.Add("Status", L.T("สถานะ", "Status"));
         grid.Columns.Add("Message", L.T("รายละเอียด", "Details"));
         foreach (var item in history.OrderByDescending(x => x.TimestampUtc)) grid.Rows.Add(item.Version, item.TimestampUtc.ToLocalTime().ToString("dd/MM/yyyy HH:mm"), item.Status, item.Message);
-        Controls.Add(grid);
+        root.Controls.Add(grid, 0, 0);
+        var actions = new FlowLayoutPanel { Dock = DockStyle.Fill, FlowDirection = FlowDirection.RightToLeft, Padding = new Padding(0, 7, 0, 0) };
+        var openLog = new Button { Text = L.T("เปิด Update Log", "Open update log"), AutoSize = true, Height = 32 };
+        openLog.Click += (_, _) =>
+        {
+            try
+            {
+                if (!File.Exists(UpdateService.UpdateLogPath))
+                {
+                    Directory.CreateDirectory(Path.GetDirectoryName(UpdateService.UpdateLogPath)!);
+                    File.WriteAllText(UpdateService.UpdateLogPath, L.T("ยังไม่มีข้อมูล Update Log", "No update log entries yet."));
+                }
+                Process.Start(new ProcessStartInfo(UpdateService.UpdateLogPath) { UseShellExecute = true });
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(this, ex.Message, L.T("เปิด Log ไม่สำเร็จ", "Unable to open log"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+        };
+        actions.Controls.Add(openLog);
+        root.Controls.Add(actions, 0, 1);
+        Controls.Add(root);
         ThemeManager.Apply(this);
     }
 }
