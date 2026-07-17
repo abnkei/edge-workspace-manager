@@ -61,6 +61,12 @@
 
 ระหว่าง Build จำเป็นต้องเชื่อมต่ออินเทอร์เน็ตครั้งแรกเพื่อดาวน์โหลด Microsoft.Web.WebView2 package
 
+## License และ Third-party software
+
+Edge Workspace Manager เผยแพร่ภายใต้ [MIT License](LICENSE) Copyright (c) 2026 Thanakhan Pariput
+
+โปรแกรมใช้ Microsoft Edge WebView2 และรวมส่วนประกอบของ Microsoft .NET ไว้ใน Release แบบ self-contained ดูรายละเอียด License ของส่วนประกอบภายนอกได้ที่ [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md)
+
 ## หมายเหตุ
 
 โปรแกรมรุ่นนี้รองรับหน้าเว็บไซต์เป็นหลัก หากต้องการนำหน้าต่างโปรแกรมอื่น เช่น SAP GUI, Excel หรือ Power Automate Desktop มาใส่ใน Tab ต้องใช้ Windows API แบบฝังหน้าต่าง ซึ่งมีข้อจำกัดและควรพัฒนาเป็นโหมดเพิ่มเติมแยกต่างหาก

@@ -29,6 +29,7 @@ public sealed class MainForm : Form
     private readonly System.Windows.Forms.Timer _awakeTimer = new() { Interval = 1000 };
     private int _workspaceDragStart = -1;
     private bool _syncingAddress;
+    private bool _addressUserEditing;
     private Button? _windowPickerButton;
     private Button? _pinTabButton;
     private readonly ToolTip _pinTabToolTip = new();
@@ -87,17 +88,30 @@ public sealed class MainForm : Form
         _pinTabButton.AccessibleName = L.T("ปักหมุด Tab ปัจจุบัน", "Pin current tab");
         bar.Controls.Add(_pinTabButton, 10, 0);
         _address.KeyDown += AddressKeyDown;
-        _address.TextChanged += (_, _) => ScheduleAddressSuggestions();
+        _address.TextChanged += (_, _) =>
+        {
+            if (!_syncingAddress && _address.Focused) _addressUserEditing = true;
+            ScheduleAddressSuggestions();
+        };
         _address.Leave += async (_, _) =>
         {
             await Task.Delay(150);
-            if (!_addressSuggestions.ContainsFocus) HideAddressSuggestions();
+            if (!_addressSuggestions.ContainsFocus)
+            {
+                _addressUserEditing = false;
+                HideAddressSuggestions();
+                SyncAddress();
+            }
         };
         bar.Controls.Add(_address, 11, 0);
         bar.Controls.Add(MakeButton(L.T("ไป", "Go"), (_, _) => NavigateAddress()), 12, 0);
         bar.Controls.Add(MakeButton(L.T("จัดการ Tab", "Manage tabs"), async (_, _) => await EditCurrentWorkspaceAsync(), width: 135), 13, 0);
 
-        _workspaceTabs.SelectedIndexChanged += (_, _) => SyncAddress();
+        _workspaceTabs.SelectedIndexChanged += (_, _) =>
+        {
+            _addressUserEditing = false;
+            SyncAddress();
+        };
         _workspaceTabs.AllowDrop = true;
         _workspaceTabs.DrawMode = TabDrawMode.OwnerDrawFixed;
         _workspaceTabs.DrawItem += DrawWorkspaceTab;
@@ -275,7 +289,11 @@ public sealed class MainForm : Form
         inner.MouseUp += BrowserTabsMouseUp;
         inner.DragOver += BrowserTabsDragOver;
         inner.DragDrop += BrowserTabsDragDrop;
-        inner.SelectedIndexChanged += (_, _) => SyncAddress();
+        inner.SelectedIndexChanged += (_, _) =>
+        {
+            _addressUserEditing = false;
+            SyncAddress();
+        };
         return inner;
     }
 
@@ -320,13 +338,14 @@ public sealed class MainForm : Form
                 var title = browser.CoreWebView2.DocumentTitle;
                 if (!string.IsNullOrWhiteSpace(title)) UpdateBrowserTabCaption(page, tab, title);
             });
+            browser.CoreWebView2.SourceChanged += (_, _) => BeginInvoke(() => WebViewSourceChanged(browser, tab));
             browser.CoreWebView2.NavigationStarting += (_, _) => _status.Text = $"กำลังเปิด {tab.Name}...";
             browser.CoreWebView2.NavigationCompleted += (_, e) =>
             {
                 tab.CurrentUrl = browser.Source?.ToString();
                 _status.Text = e.IsSuccess ? "พร้อมใช้งาน" : $"เปิดหน้าไม่สำเร็จ: {e.WebErrorStatus}";
                 if (e.IsSuccess) AddHistory(workspace, browser);
-                SyncAddress();
+                SyncAddressFrom(browser);
                 SaveSession();
             };
             browser.CoreWebView2.DownloadStarting += (_, e) => TrackDownload(e);
@@ -975,11 +994,32 @@ public sealed class MainForm : Form
     private void SyncAddress()
     {
         var browser = CurrentWebView();
+        if (_addressUserEditing)
+        {
+            UpdatePinButtonState();
+            return;
+        }
         _syncingAddress = true;
         _address.Text = browser?.Source?.ToString() ?? CurrentTab()?.CurrentUrl ?? CurrentTab()?.Url ?? "";
         _syncingAddress = false;
         HideAddressSuggestions();
         UpdatePinButtonState();
+    }
+
+    private void WebViewSourceChanged(WebView2 browser, BrowserTab tab)
+    {
+        var url = browser.Source?.ToString();
+        if (string.IsNullOrWhiteSpace(url)) return;
+
+        tab.CurrentUrl = url;
+        SyncAddressFrom(browser);
+        SaveSession();
+    }
+
+    private void SyncAddressFrom(WebView2 browser)
+    {
+        if (!ReferenceEquals(browser, CurrentWebView()) || _addressUserEditing) return;
+        SyncAddress();
     }
 
     private void UpdatePinButtonState()
@@ -1115,6 +1155,7 @@ public sealed class MainForm : Form
         HideAddressSuggestions();
         var browser = CurrentWebView();
         if (browser is null || string.IsNullOrWhiteSpace(_address.Text)) return;
+        _addressUserEditing = false;
         try { browser.Source = new Uri(ToNavigationUrl(_address.Text)); }
         catch { MessageBox.Show("URL หรือคำค้นหาไม่ถูกต้อง", "แจ้งเตือน", MessageBoxButtons.OK, MessageBoxIcon.Warning); }
     }

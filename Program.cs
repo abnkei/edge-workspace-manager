@@ -15,6 +15,19 @@ internal static class Program
 
 public static class AppInfo
 {
+    public static string BuildCommit
+    {
+        get
+        {
+            var value = Assembly.GetExecutingAssembly()
+                .GetCustomAttributes<AssemblyMetadataAttribute>()
+                .FirstOrDefault(attribute => attribute.Key == "BuildCommit")?.Value;
+            return string.IsNullOrWhiteSpace(value) || value == "unknown"
+                ? "Local build"
+                : value[..Math.Min(7, value.Length)];
+        }
+    }
+
     public static string Version
     {
         get

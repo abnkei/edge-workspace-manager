@@ -19,7 +19,7 @@ jobs:
       - name: Restore
         run: dotnet restore EdgeWorkspaceManager.csproj
       - name: Publish application
-        run: dotnet publish EdgeWorkspaceManager.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o artifacts/app
+        run: dotnet publish EdgeWorkspaceManager.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:BuildCommit=${{ github.sha }} -o artifacts/app
       - name: Publish updater
         run: dotnet publish Updater/EdgeWorkspaceManager.Updater.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o artifacts/updater
       - name: Package and create manifest
