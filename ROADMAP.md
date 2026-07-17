@@ -2,23 +2,6 @@
 
 ## Next Update Queue
 
-### Planned for v1.7.0: Official Public Update
-
-- ใช้ Official Public Release ผ่าน HTTPS เป็นแหล่งอัปเดตเดียวของโปรแกรม
-- เก็บ Update Manifest และไฟล์ Release บน GitHub Releases แบบ Public โดยผู้ใช้ไม่ต้องมี GitHub Account หรือ Token
-- ตรวจสอบเวอร์ชันล่าสุดจาก Official Update Manifest เมื่อเปิดโปรแกรมและตามรอบเวลา
-- แสดงหน้าต่างแจ้งเตือนคล้าย Windows Update พร้อมเวอร์ชัน วันที่ ขนาดไฟล์และ Release Notes
-- เพิ่มตัวเลือก `Update now`, `Remind me later` และ `Skip this version`
-- ดาวน์โหลดไฟล์อัปเดตพร้อมแสดงความคืบหน้า
-- ตรวจสอบ SHA-256 และความถูกต้องของไฟล์ก่อนติดตั้ง
-- เพิ่ม `Updater.exe` สำหรับปิดโปรแกรมหลัก ติดตั้งเวอร์ชันใหม่และเปิดโปรแกรมอีกครั้ง
-- บันทึก Tab, URL, Instance และ Session ก่อนเริ่มอัปเดต
-- เพิ่มหน้า Update History แสดงเวอร์ชัน วันที่ติดตั้ง สถานะและรายละเอียดการเปลี่ยนแปลง
-- เพิ่มปุ่ม `Check for updates` ใน Settings หรือ About
-- รักษา Config, WebView Profile, Cookie, Login และ Session เดิมหลังอัปเดต
-- โปรแกรมต้องยังใช้งานได้ตามปกติเมื่อไม่มี Internet หรือตรวจสอบอัปเดตไม่สำเร็จ
-- ออกแบบ `downloadUrl` ใน Manifest ให้ย้ายไป Official Website/CDN ได้ในอนาคตโดยไม่เปลี่ยนโครงสร้าง Updater
-
 ### Planned for v1.7.1: Update Recovery
 
 - สำรองเวอร์ชันเดิมก่อนติดตั้งไฟล์ใหม่
@@ -58,6 +41,18 @@
 - หลังอัปเดต Tab, URL, Login, Cookie, Profile และ Session ต้องยังคงอยู่
 - ทุกความสำเร็จ ความล้มเหลว การข้ามและ Rollback ต้องแสดงใน Update History
 - ไม่รองรับ Custom Update Server, SharePoint, Network Folder, Private Repository หรือ Offline Update Package ใน Roadmap ชุดนี้
+
+## Completed in v1.7.0
+
+### Official Public Update
+
+- ตรวจเวอร์ชันจาก Public GitHub Releases ผ่าน HTTPS โดยไม่ต้อง Login
+- แสดง Release Notes และตัวเลือก `Update now`, `Remind me later`, `Skip this version`
+- ดาวน์โหลดแบบแสดงความคืบหน้าและตรวจ SHA-256 ก่อนติดตั้ง
+- ใช้ Updater แยกเพื่อปิด ติดตั้ง และเปิดโปรแกรมกลับอัตโนมัติ
+- บันทึก Tab และ Session ก่ออัปเดต โดยไม่รวม Config หรือ WebView Profile ใน Package
+- เพิ่ม Check for updates, Update History และตัวเลือกปิดการตรวจอัปเดตอัตโนมัติ
+- GitHub Actions สร้าง ZIP, `update.json`, SHA-256 และ Public Release จาก tag อัตโนมัติ
 
 ## Completed in v1.6.1
 
