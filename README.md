@@ -45,22 +45,21 @@
 - Export ทุก Instance, Instance ปัจจุบัน หรือ Tab ปัจจุบันพร้อม Favorites เป็นไฟล์ `.ewmbackup`
 - Import Metadata Backup เป็น Instance และ Profile ใหม่โดยไม่เขียนทับข้อมูลเดิม
 - ตรวจ Manifest, จำนวนรายการ และ SHA-256 ก่อน Import โดยไม่รวม Cookie, Login, Password หรือ WebView2 Profile
+- ถามยืนยันก่อนปิดโปรแกรมด้วยปุ่ม `X` หรือ `Alt+F4` และบันทึก Session ก่อนออก
+- ปุ่ม `+` ต่อจาก Tab สุดท้ายสำหรับเปิด Tab ใหม่ใน Instance ปัจจุบัน
 
 ## Build เป็น EXE
 
 1. ติดตั้ง .NET 8 SDK บน Windows
 2. แตก ZIP
 3. ดับเบิลคลิก `build.bat`
-4. ไฟล์จะอยู่ที่ `releases\v2.1.0\EdgeWorkspaceManager.exe`
+4. ไฟล์จะอยู่ที่ `releases\v2.1.1\EdgeWorkspaceManager.exe`
 
 เลขเวอร์ชันจะแสดงบนแถบสถานะด้านล่างของโปรแกรม กดที่เลขเวอร์ชันเพื่อดูรายการอัปเดตทั้งหมด
 
 ## คิวอัปเดตถัดไป
 
-- v2.1.1: Import Preview, Merge Conflict และ Automatic Rollback
-- v2.2.0: Password-encrypted Full Local Backup รวม WebView2 Profile แบบทดลอง
-
-Update Channels and Policy ถูกเลื่อนออกไปก่อนและยังไม่กำหนดเวอร์ชันใหม่
+ยังไม่ได้กำหนดเวอร์ชันถัดไป โดย Import Preview, Incognito, Live Theme Switching, Full Local Backup และ Update Channels ถูกเลื่อนออกไปก่อน
 
 รายละเอียดและเงื่อนไขการทดสอบอยู่ใน `ROADMAP.md`
 
