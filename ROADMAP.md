@@ -2,15 +2,7 @@
 
 ## Next Update Queue
 
-### Planned for v1.7.1: Update Recovery
-
-- สำรองเวอร์ชันเดิมก่อนติดตั้งไฟล์ใหม่
-- Rollback อัตโนมัติเมื่อการติดตั้งหรือการเปิดเวอร์ชันใหม่ไม่สำเร็จ
-- ปรับปรุง Error Handling กรณีดาวน์โหลดขาดหาย พื้นที่ไม่พอ ไม่มีสิทธิ์เขียนหรือ Hash ไม่ตรง
-- เพิ่ม Retry และข้อความแนะนำที่เข้าใจง่าย
-- บันทึก Update Log และรายละเอียดความล้มเหลวสำหรับตรวจสอบ
-
-### Planned for v1.8.0: Update Channels and Policy
+### Planned for v2.1.0: Update Channels and Policy
 
 - เพิ่ม Update Channel แบบ `Stable` และ `Beta`
 - ดาวน์โหลดอัปเดตอัตโนมัติเบื้องหลังโดยไม่รบกวนการทำงาน
@@ -41,6 +33,18 @@
 - หลังอัปเดต Tab, URL, Login, Cookie, Profile และ Session ต้องยังคงอยู่
 - ทุกความสำเร็จ ความล้มเหลว การข้ามและ Rollback ต้องแสดงใน Update History
 - ไม่รองรับ Custom Update Server, SharePoint, Network Folder, Private Repository หรือ Offline Update Package ใน Roadmap ชุดนี้
+
+## Completed in v2.0.0
+
+### Update Recovery, Rollback and Error Handling
+
+- สำรองไฟล์เวอร์ชันเดิมและสร้าง Recovery Journal ก่อนเขียนไฟล์ใหม่
+- ตรวจว่าโปรแกรมใหม่เปิดและโหลด Workspace สำเร็จด้วย Startup Health Check
+- Rollback และเปิดเวอร์ชันเดิมกลับอัตโนมัติเมื่อการติดตั้งหรือ Startup ล้มเหลว
+- ดาวน์โหลดผ่านไฟล์ `.part` พร้อม Retry อัตโนมัติและตรวจขนาดก่อนตรวจ SHA-256
+- ตรวจพื้นที่ว่างและแสดงข้อความแนะนำสำหรับ Network, Timeout, Permission, Disk และ Package Error
+- เพิ่ม Update Log และสถานะ `Installed`, `RolledBack`, `RollbackFailed` ใน Update History
+- เริ่มใช้ Edge Workspace Manager Community License 1.0 สำหรับ v2.0.0 เป็นต้นไป
 
 ## Completed in v1.7.0
 

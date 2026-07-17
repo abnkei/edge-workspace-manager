@@ -48,22 +48,44 @@
 1. ติดตั้ง .NET 8 SDK บน Windows
 2. แตก ZIP
 3. ดับเบิลคลิก `build.bat`
-4. ไฟล์จะอยู่ที่ `releases\v1.7.4\EdgeWorkspaceManager.exe`
+4. ไฟล์จะอยู่ที่ `releases\v2.0.0\EdgeWorkspaceManager.exe`
 
 เลขเวอร์ชันจะแสดงบนแถบสถานะด้านล่างของโปรแกรม กดที่เลขเวอร์ชันเพื่อดูรายการอัปเดตทั้งหมด
 
 ## คิวอัปเดตถัดไป
 
-- v1.7.1: Update Recovery, Rollback และ Error Handling
-- v1.8.0: Stable/Beta Channel, Background Download และ Critical Update Policy
+- v2.1.0: Stable/Beta Channel, Background Download และ Critical Update Policy
 
 รายละเอียดและเงื่อนไขการทดสอบอยู่ใน `ROADMAP.md`
 
 ระหว่าง Build จำเป็นต้องเชื่อมต่ออินเทอร์เน็ตครั้งแรกเพื่อดาวน์โหลด Microsoft.Web.WebView2 package
 
-## License และ Third-party software
+## License
 
-Edge Workspace Manager เผยแพร่ภายใต้ [MIT License](LICENSE) Copyright (c) 2026 Thanakhan Pariput
+| Version | License |
+|---|---|
+| v1.7.4 and earlier | [MIT License](licenses/MIT-v1.7.4-and-earlier.txt) |
+| v2.0.0 and later | [Edge Workspace Manager Community License 1.0](LICENSE) |
+
+Edge Workspace Manager ตั้งแต่ v2.0.0 เป็นต้นไปเผยแพร่ภายใต้ [Edge Workspace Manager Community License 1.0](LICENSE) Copyright (c) 2026 Thanakhan Pariput ซึ่งเป็น Source-available License และไม่ใช่ OSI-approved Open Source License
+
+License อนุญาตให้ใช้งานส่วนบุคคล การศึกษา งานวิจัย และใช้งานภายในองค์กรได้ฟรี รวมถึงอนุญาตให้ผู้ให้บริการใช้ Official Binary เป็นเครื่องมือประกอบในระบบ RPA, VDI, Hosting หรือ Managed Service ที่มีคุณค่าหลักมาจากระบบโดยรวม ผู้ให้บริการสามารถคิดค่าระบบ Infrastructure, Automation, Integration และการดำเนินงานได้ แต่ห้ามแยกขายหรือกำหนดราคาโดยอิง License, User, Workspace, Tab, Installation, Support หรือ Training ของ Edge Workspace Manager และห้ามนำ Source Code หรือ Derivative Work ไปสร้างผลิตภัณฑ์หรือบริการเชิงพาณิชย์โดยไม่มี Commercial License
+
+รุ่นที่เคยเผยแพร่ภายใต้ MIT License ยังคงได้รับสิทธิ์ตาม MIT License ของรุ่นนั้น การเปลี่ยน License ไม่มีผลเพิกถอนสิทธิ์ที่ให้ไปแล้ว
+
+### Contributor License Agreement (CLA)
+
+ผู้ร่วมพัฒนายังคงเป็นเจ้าของลิขสิทธิ์ใน Code และเอกสารที่ตนส่งเข้ามา แต่การส่ง Pull Request เพื่อรวมเข้าโครงการถือเป็นการให้สิทธิ์แก่ผู้ดูแลโครงการตาม Section 10 ของ [Community License](LICENSE) รวมถึงสิทธิ์ในการใช้งาน แก้ไข แจกจ่าย ออก License ใหม่ และออก Commercial License สำหรับ Contribution นั้น
+
+โครงการใช้ CLA เพื่อให้สามารถดูแล Community Edition ภายใต้เงื่อนไขเดียวกัน ออก Commercial License ให้ผู้ที่ต้องการสิทธิ์เพิ่มเติม และบริหารโครงการได้อย่างต่อเนื่องในระยะยาว โดย CLA ไม่ได้โอนความเป็นเจ้าของ Contribution ออกจากผู้ร่วมพัฒนา และผู้ร่วมพัฒนายังคงสามารถนำผลงานของตนไปใช้งานหรือให้ License เพื่อวัตถุประสงค์อื่นได้
+
+ก่อนส่ง Pull Request ผู้ร่วมพัฒนาต้องมีสิทธิ์ใน Contribution นั้น และหากเป็นผลงานที่สร้างระหว่างการจ้างงาน ต้องได้รับอนุญาตจากนายจ้างหรือองค์กรที่เกี่ยวข้องก่อน
+
+### Commercial License
+
+หากต้องการนำ Source Code หรือ Derivative Work ไปใช้ในผลิตภัณฑ์หรือบริการเชิงพาณิชย์ สร้างบริการที่มีคุณค่าหลักจากโปรแกรม แจกจ่าย Binary, Rebrand โปรแกรม หรือขอสิทธิ์ที่ Community License ไม่อนุญาต กรุณาติดต่อ [abnkei@gmail.com](mailto:abnkei@gmail.com?subject=Edge%20Workspace%20Manager%20Commercial%20License)
+
+โปรดระบุชื่อผู้ติดต่อ ชื่อองค์กร รูปแบบการใช้งาน จำนวนผู้ใช้หรือลูกค้า รูปแบบการติดตั้งหรือเผยแพร่ และสิทธิ์ที่ต้องการ การส่งคำถามไม่ได้ให้สิทธิ์เชิงพาณิชย์ สิทธิ์ดังกล่าวจะเกิดขึ้นต่อเมื่อทั้งสองฝ่ายอนุมัติข้อตกลงเป็นลายลักษณ์อักษรแยกต่างหากแล้วเท่านั้น
 
 โปรแกรมใช้ Microsoft Edge WebView2 และรวมส่วนประกอบของ Microsoft .NET ไว้ใน Release แบบ self-contained ดูรายละเอียด License ของส่วนประกอบภายนอกได้ที่ [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md)
 

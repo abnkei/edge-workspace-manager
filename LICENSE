@@ -1,21 +1,338 @@
-MIT License
+Edge Workspace Manager Community License 1.0
+
+Effective Date: 18 July 2026
+Effective Version: 2.0.0 and later
 
 Copyright (c) 2026 Thanakhan Pariput
+All rights reserved except as expressly granted under this License.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+1. Definitions
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+"Software" means the Edge Workspace Manager source code, documentation,
+executable files, installers, update manifests, and other materials distributed
+with this License.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+"Licensor" means Thanakhan Pariput.
+
+"Official Binary" means an executable, installer, ZIP package, update
+manifest, or other compiled release published through an Official Distribution
+Channel controlled or expressly authorized by the Licensor.
+
+"Derivative Work" means any modification, adaptation, fork, translation,
+integration, or other work based substantially on the Software or its source
+code.
+
+"Official Distribution Channel" means the GitHub Releases page of
+abnkei/edge-workspace-manager, a Microsoft Store listing published by the
+Licensor, a website or server controlled by the Licensor, or another channel
+expressly authorized in writing by the Licensor.
+
+"Primary Software Value" means that a product or service is purchased mainly
+to obtain access to, operation of, support for, or functionality derived from
+the Software. Indicators include marketing the Software's features as a main
+service benefit, pricing by Software users, Workspaces, Tabs, installations, or
+support levels, or a material loss of the service's value if the Software were
+removed. Merely using the Software as an incidental tool within a broader RPA,
+infrastructure, automation, security, integration, or business-operations
+service does not by itself create Primary Software Value.
+
+"Contribution" means copyrightable source code, documentation, tests, or other
+material intentionally submitted for inclusion in the Software.
+
+2. License Grant
+
+Subject to this License, the Licensor grants you a limited, non-exclusive,
+worldwide, royalty-free, non-transferable license to:
+
+- use the Software for personal, educational, research, evaluation, and
+  internal business purposes;
+- download and run Official Binaries;
+- copy the source code for development and backup purposes;
+- modify and improve the source code;
+- fork the source-code repository;
+- submit issues and Pull Requests;
+- redistribute original or modified source code under this License; and
+- use the Software in a permitted managed or hosted environment under Section 4.
+
+No rights are granted except those expressly stated in this License.
+
+3. Internal Business Use
+
+Internal business use is permitted without charge. This includes employees
+using the Software to access accounting, ERP, CRM, RPA, intranet, call-center,
+or other business systems and organizations using the Software to support
+revenue-generating operations unrelated to commercializing the Software
+itself.
+
+The Software may be used on company-owned or company-controlled computers,
+servers, virtual machines, Cloud PCs, and remote desktops. A business may earn
+revenue from its normal operations while using the Software internally.
+
+4. Permitted Managed, Hosted, and Operational Services
+
+A service provider may install and operate an unmodified Official Binary in an
+RPA, VDI, Cloud PC, virtual machine, Remote Desktop, hosted desktop, SaaS, or
+managed operational environment and may allow its customers to access and use
+the Software remotely, provided that the service does not have Primary
+Software Value.
+
+A provider may charge for the overall value of a broader service, including:
+
+- RPA design and operation;
+- infrastructure, servers, hosting, VDI, Cloud PC, or remote access;
+- automation workflows and business-process operation;
+- system integration, monitoring, security, backup, and compliance; and
+- support and maintenance of the provider's broader environment.
+
+Installing, configuring, updating, monitoring, or providing ordinary
+Software-specific assistance is permitted when it is incidental to such a
+broader service and is not separately priced, separately marketed, or used to
+increase the service price because the Software is included.
+
+A provider may not charge a separate, additional, itemized, per-user,
+per-Workspace, per-Tab, per-installation, subscription, support-tier, training,
+or license fee for the Software. A provider also may not describe a broader
+service fee as infrastructure or managed-service revenue when the service in
+substance has Primary Software Value.
+
+Examples of permitted services include an RPA provider using the Software as
+one operational tool in a wider automation solution, or a VDI provider making
+the Software available within a managed desktop whose primary value is the
+desktop and infrastructure service.
+
+This Section does not permit using source code or a Derivative Work to build a
+commercial service, rebranding the Software, or offering a service whose main
+commercial value is access to the Software's Workspace, Tab, WebView, or
+browser-management functionality.
+
+5. Source-Code Forks and Modifications
+
+You may fork and modify the source code for personal, educational, research,
+internal business, and non-commercial community purposes.
+
+When redistributing original or modified source code, you must:
+
+- include a complete copy of this License;
+- preserve all copyright, attribution, licensing, and third-party notices;
+- clearly identify the work as modified from Edge Workspace Manager;
+- describe the material modifications made;
+- use a name that does not imply that the modified version is an Official
+  release;
+- not use the Licensor's name, project name, branding, or logos in a manner
+  that suggests endorsement, sponsorship, certification, or affiliation; and
+- distribute the source code under this same License without adding terms that
+  reduce or conflict with this License.
+
+Permission to distribute source code does not include permission to distribute
+compiled binaries, installers, ZIP packages, or update manifests.
+
+6. Official Binaries and Distribution
+
+Official Binaries may be downloaded and installed from an Official
+Distribution Channel. You may share links that direct users to an Official
+Distribution Channel.
+
+Unless you have prior written permission from the Licensor, you may not:
+
+- re-upload, mirror, host, cache for public distribution, or redistribute an
+  Official Binary;
+- make an Official Binary available for download from another website,
+  repository, file-sharing service, application store, server, or content
+  delivery network;
+- repackage, rename, wrap, modify, or digitally re-sign an Official Binary;
+- publish a modified or replacement update manifest;
+- represent a third-party download as an Official Distribution Channel; or
+- distribute compiled binaries created from a Derivative Work.
+
+Installing an Official Binary in an environment operated for an authorized
+customer under Section 4 is permitted and is not public redistribution,
+provided that the installer or binary is not separately made available for
+download or copying.
+
+7. Bundling with Other Products
+
+The Software may be offered as a free, optional companion to another product
+or service by providing a link to an Official Distribution Channel. No portion
+of the price of the other product or service may be attributed to the Software.
+
+An Official Binary may not be included directly inside another downloadable
+package, installer, product bundle, application-store listing, or hosted file
+without prior written permission from the Licensor.
+
+The other product or service must not depend primarily on the Software for its
+commercial value, claim ownership of the Software, rebrand the Software,
+suggest endorsement by the Licensor, or remove or alter any legal notice.
+
+8. Prohibited Software-Centric Commercial Uses
+
+Without a separate written commercial license from the Licensor, you may not:
+
+- sell, license, sublicense, rent, lease, or commercially distribute the
+  Software or any Derivative Work;
+- sell access to a modified, forked, rebranded, or source-derived version of
+  the Software;
+- offer a product, subscription, hosted application, SaaS, PaaS, managed
+  service, or support service that has Primary Software Value;
+- use source code to create a paid Browser Workspace, Tab Management, WebView
+  workspace, hosted application, subscription service, or managed software
+  product;
+- incorporate source code or a Derivative Work into a commercial product or
+  service;
+- expose source-derived functionality through an API, website, desktop
+  application, mobile application, automation platform, or other paid service;
+- separately sell or market Software installation, configuration, maintenance,
+  support, or training;
+- calculate or increase a fee based on Software users, Workspaces, Tabs,
+  installations, usage, support, maintenance, or training;
+- disguise a Software-related fee as part of another mandatory purchase,
+  subscription, infrastructure charge, managed-service charge, or contract; or
+- falsely imply ownership, endorsement, sponsorship, or affiliation.
+
+This Section does not prohibit internal business use or the incidental use and
+assistance expressly permitted under Sections 3 and 4.
+
+9. Third-Party Provider Responsibilities
+
+A third-party RPA, VDI, SaaS, hosting, managed-service, or remote-access
+provider is solely responsible for its infrastructure, security, access
+control, customer data, backups, availability, automation, integrations,
+regulatory compliance, customer support, and all claims arising from its
+service.
+
+The provider must clearly inform customers that its service is independently
+operated and is not an official service of, sponsored by, endorsed by, or
+supported by the Licensor unless the provider has express written
+authorization.
+
+10. Contributor License Agreement
+
+Each contributor retains copyright ownership of their Contribution.
+
+By intentionally submitting a Contribution for inclusion in the Software, the
+contributor grants the Licensor a perpetual, irrevocable, worldwide,
+non-exclusive, royalty-free, transferable, and sublicensable license to use,
+copy, modify, prepare derivative works from, distribute, publish, publicly
+perform, publicly display, relicense, and commercially license the
+Contribution, alone or as part of the Software.
+
+The contributor also grants the Licensor and recipients of the Software a
+perpetual, worldwide, royalty-free patent license under patent claims owned or
+controlled by the contributor that are necessarily infringed by the
+Contribution alone or by its combination with the Software.
+
+This grant does not transfer ownership of the Contribution and does not prevent
+the contributor from using, licensing, or distributing their Contribution for
+other purposes.
+
+The contributor represents that they have the legal right to submit the
+Contribution and grant these rights. If the Contribution was created within
+the scope of employment or for another organization, the contributor
+represents that they have obtained all required permission from that employer
+or organization.
+
+The purpose of this Contributor License Agreement is to allow the Licensor to
+maintain consistent licensing, protect the community edition, provide long-term
+project stewardship, and offer separate Commercial Licenses without removing
+contributors' ownership of their work.
+
+General feedback, feature requests, and issue reports that do not contain
+copyrightable source code or documentation are not Contributions under this
+Section.
+
+11. Copyright, Notices, and Trademarks
+
+You may not remove, obscure, or alter the Licensor's copyright notice, this
+License, third-party notices, attribution notices, or other legal notices.
+
+This License does not grant any right to use the Licensor's name, project
+branding, logos, trademarks, or service marks except as reasonably necessary
+to identify the original Software and comply with attribution requirements.
+
+12. Third-Party Components
+
+Third-party components remain subject to their respective licenses and
+notices. This License does not replace, modify, restrict, or override any
+third-party license. Applicable notices are provided in
+THIRD-PARTY-NOTICES.md and other notice files distributed with the Software.
+
+13. Commercial Licensing
+
+Uses not permitted by this License may be available under a separate written
+Commercial License from the Licensor. Commercial rights are granted only
+through a written agreement expressly approved by the Licensor.
+
+Commercial licensing inquiries may be sent to:
+
+Email: abnkei@gmail.com
+
+Please include your name, organization, intended use, distribution model,
+number of users or customers, requested rights, and expected deployment model.
+
+Submitting an inquiry does not grant any commercial rights. Commercial rights
+are granted only after the Licensor and the requesting party approve a
+separate written agreement.
+
+14. Termination
+
+Your rights under this License terminate automatically if you violate any
+term. Upon termination, you must stop all unauthorized use and distribution
+and remove all unauthorized copies, mirrors, hosted files, products, and
+services under your control.
+
+The Licensor may reinstate your rights in writing after the violation has been
+fully corrected. Sections concerning copyright, restrictions, provider
+responsibility, contribution rights, disclaimers, limitation of liability, and
+termination survive termination.
+
+15. Disclaimer of Warranty
+
+THE SOFTWARE IS PROVIDED "AS IS" AND "AS AVAILABLE," WITHOUT WARRANTY OF ANY
+KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE, NON-INFRINGEMENT,
+SECURITY, AVAILABILITY, ACCURACY, OR RELIABILITY.
+
+THE LICENSOR DOES NOT WARRANT THAT THE SOFTWARE WILL BE ERROR-FREE,
+UNINTERRUPTED, SECURE, COMPATIBLE WITH ANY PARTICULAR WEBSITE OR SYSTEM, OR
+SUITABLE FOR ANY PARTICULAR BUSINESS, RPA, AUTOMATION, HOSTING, OR CUSTOMER
+ENVIRONMENT.
+
+16. Limitation of Liability
+
+TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, THE LICENSOR SHALL NOT BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, PUNITIVE, OR
+CONSEQUENTIAL DAMAGES, INCLUDING LOSS OF DATA, PROFITS, REVENUE, BUSINESS,
+SECURITY, OR AVAILABILITY, ARISING FROM INSTALLATION, CONFIGURATION, USE,
+MODIFICATION, HOSTING, REMOTE ACCESS, REDISTRIBUTION, OR INABILITY TO USE THE
 SOFTWARE.
+
+ANY THIRD-PARTY PROVIDER THAT INSTALLS, HOSTS, OPERATES, CONFIGURES, INTEGRATES,
+OR MAKES THE SOFTWARE AVAILABLE TO CUSTOMERS DOES SO AT ITS OWN RISK AND
+REMAINS SOLELY RESPONSIBLE FOR ITS SERVICE AND CUSTOMERS.
+
+Where applicable law does not allow a particular exclusion or limitation,
+these provisions apply only to the maximum extent permitted by that law.
+
+17. Prior MIT-Licensed Versions
+
+Edge Workspace Manager version 1.7.4 and all earlier versions were released
+under the MIT License applicable to those versions.
+
+This Community License applies to version 2.0.0 and later versions that
+expressly include this License.
+
+Source-code revisions committed before the license-change commit remain
+available under the MIT License that applied when those revisions were
+published.
+
+Nothing in this License revokes, restricts, or replaces rights previously
+granted under the MIT License.
+
+18. Entire License
+
+This License is the complete license governing Software versions that include
+it. Any exception, waiver, Commercial License, binary-distribution permission,
+branding permission, or alternative arrangement must be provided in writing
+by the Licensor.
+
+This is a source-available license and is not represented as an OSI-approved
+Open Source license.

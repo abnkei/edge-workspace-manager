@@ -50,6 +50,9 @@ public sealed class MainForm : Form
         {
             ImportUpdateResult();
             await ReloadWorkspaceAsync();
+            CompleteUpdateHealthCheck();
+            if (!string.IsNullOrWhiteSpace(AppInfo.UpdateHealthPath))
+                await ImportUpdateResultWhenAvailableAsync();
             await CheckForUpdatesAsync(false);
         };
         _awakeTimer.Tick += (_, _) => { CheckAwakeTimeout(); CheckSystemTheme(); };
@@ -195,13 +198,15 @@ public sealed class MainForm : Form
                     UpdateService.LaunchUpdater(download.StagingPath, update.Version);
                     Close();
                 }
-                else AddUpdateHistory(update.Version, "Failed", L.T("ดาวน์โหลดหรือตรวจสอบไฟล์ไม่สำเร็จ", "Download or verification failed"));
+                else AddUpdateHistory(update.Version, "Failed", download.FailureMessage ??
+                    L.T("ดาวน์โหลดหรือตรวจสอบไฟล์ไม่สำเร็จ", "Download or verification failed"));
             }
         }
         catch (Exception ex)
         {
+            UpdateService.WriteLog($"Update check failed: {ex}");
             _status.Text = L.T("ไม่สามารถตรวจอัปเดตได้", "Unable to check for updates");
-            if (manual) MessageBox.Show(this, ex.Message, _status.Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            if (manual) MessageBox.Show(this, UpdateService.FriendlyError(ex), _status.Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
         }
     }
 
@@ -229,6 +234,37 @@ public sealed class MainForm : Form
             File.Delete(path);
         }
         catch { }
+    }
+
+    private void CompleteUpdateHealthCheck()
+    {
+        if (string.IsNullOrWhiteSpace(AppInfo.UpdateHealthPath)) return;
+        try
+        {
+            var path = Path.GetFullPath(AppInfo.UpdateHealthPath);
+            Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+            File.WriteAllText(path, $"{AppInfo.Version}|Healthy|{DateTimeOffset.UtcNow:O}");
+            _status.Text = L.T("อัปเดตและกู้คืน Session สำเร็จ", "Update and session recovery completed");
+        }
+        catch (Exception ex)
+        {
+            UpdateService.WriteLog($"Could not write update health check: {ex}");
+        }
+    }
+
+    private async Task ImportUpdateResultWhenAvailableAsync()
+    {
+        var path = Path.Combine(ConfigStore.AppFolder, "Updates", "update-result.txt");
+        for (var attempt = 0; attempt < 20; attempt++)
+        {
+            if (File.Exists(path))
+            {
+                ImportUpdateResult();
+                return;
+            }
+            await Task.Delay(250);
+        }
+        UpdateService.WriteLog("The application became healthy, but the updater result was not available within 5 seconds.");
     }
 
     private async Task ReloadWorkspaceAsync()
