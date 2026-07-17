@@ -62,6 +62,24 @@
 - หากลบ Profile ชั่วคราวไม่สำเร็จ โปรแกรมต้องบันทึก Cleanup Queue และลองลบใหม่โดยไม่เปิดเผยข้อมูลใน UI
 - การ Update, Crash Recovery และ Close Confirmation ต้องไม่เปลี่ยน Incognito ให้กลายเป็น Session ถาวร
 
+### Requested: Live Theme Switching without Restart
+
+- เปลี่ยน Theme ระหว่าง `Light`, `Dark` และ `Use Windows setting` ได้ทันทีหลังบันทึก Settings
+- อัปเดต Toolbar, Address Bar, Instance/Tab bar, Status bar, Menu, Dialog และหน้าต่าง Browser Tools ที่เปิดอยู่
+- ไม่ Restart โปรแกรม ไม่สร้าง WebView ใหม่ และไม่ Reload หน้าเว็บ
+- รักษา URL, Login, Cookie, Session, Focused Tab และตำแหน่ง Scroll ของหน้าเว็บเดิม
+- คำนวณ Contrast ของ Focused Tab และ Instance Color ใหม่ตาม Theme ที่เลือก
+- เมื่อเลือก `Use Windows setting` ให้เปลี่ยนตาม Windows Theme ระหว่างที่โปรแกรมเปิดอยู่
+- แยก `Force dark web pages` ออกจาก Theme ของตัวโปรแกรมและแจ้งชัดเจนหากต้องเปิดโปรแกรมใหม่
+
+### Live Theme Switching Acceptance Criteria
+
+- เปลี่ยน Light/Dark/System แล้ว UI ทุกส่วนที่เปิดอยู่ต้องเปลี่ยนทันทีโดยไม่ Restart
+- จำนวน WebView, Process, Instance และ Tab ต้องไม่เปลี่ยนจากการสลับ Theme
+- Login, Session, URL ปัจจุบัน และสถานะ Pin ต้องคงเดิม
+- ไม่มีพื้นหลังหรือข้อความสีเดิมค้างใน Menu, Dialog, Grid หรือ Tab ที่กำลัง Focus
+- การสลับ Theme หลายครั้งติดต่อกันต้องไม่ทำให้ Event ซ้ำ Memory เพิ่มต่อเนื่อง หรือ UI ค้าง
+
 ### Planned for v2.2.0: Password-encrypted Full Local Backup (Experimental)
 
 - สำรอง Metadata พร้อม WebView2 Profile เป็นตัวเลือกขั้นสูง
