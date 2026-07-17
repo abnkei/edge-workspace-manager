@@ -42,19 +42,25 @@
 - Pin/Unpin Tab จาก Toolbar, เมนูคลิกขวา หรือ `Ctrl+Shift+P`
 - Official Public Update ผ่าน GitHub Releases พร้อม SHA-256 verification
 - Update now, Remind me later, Skip this version และ Update History
+- Export ทุก Instance, Instance ปัจจุบัน หรือ Tab ปัจจุบันพร้อม Favorites เป็นไฟล์ `.ewmbackup`
+- Import Metadata Backup เป็น Instance และ Profile ใหม่โดยไม่เขียนทับข้อมูลเดิม
+- ตรวจ Manifest, จำนวนรายการ และ SHA-256 ก่อน Import โดยไม่รวม Cookie, Login, Password หรือ WebView2 Profile
 
 ## Build เป็น EXE
 
 1. ติดตั้ง .NET 8 SDK บน Windows
 2. แตก ZIP
 3. ดับเบิลคลิก `build.bat`
-4. ไฟล์จะอยู่ที่ `releases\v2.0.0\EdgeWorkspaceManager.exe`
+4. ไฟล์จะอยู่ที่ `releases\v2.1.0\EdgeWorkspaceManager.exe`
 
 เลขเวอร์ชันจะแสดงบนแถบสถานะด้านล่างของโปรแกรม กดที่เลขเวอร์ชันเพื่อดูรายการอัปเดตทั้งหมด
 
 ## คิวอัปเดตถัดไป
 
-- v2.1.0: Stable/Beta Channel, Background Download และ Critical Update Policy
+- v2.1.1: Import Preview, Merge Conflict และ Automatic Rollback
+- v2.2.0: Password-encrypted Full Local Backup รวม WebView2 Profile แบบทดลอง
+
+Update Channels and Policy ถูกเลื่อนออกไปก่อนและยังไม่กำหนดเวอร์ชันใหม่
 
 รายละเอียดและเงื่อนไขการทดสอบอยู่ใน `ROADMAP.md`
 

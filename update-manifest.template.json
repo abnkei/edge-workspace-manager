@@ -1,18 +1,18 @@
 {
-  "version": "2.0.0",
+  "version": "2.1.0",
   "releaseDate": "2026-07-18T00:00:00Z",
   "downloadUrl": "https://github.com/abnkei/edge-workspace-manager/releases/latest/download/EdgeWorkspaceManager-win-x64.zip",
   "sha256": "GENERATED_BY_GITHUB_ACTIONS",
   "size": 0,
   "priority": "recommended",
   "releaseNotesTh": [
-    "เพิ่ม Recovery Backup และ Startup Health Check ก่อนยืนยันการอัปเดต",
-    "Rollback อัตโนมัติและเปิดเวอร์ชันเดิมกลับเมื่อเวอร์ชันใหม่เริ่มทำงานไม่สำเร็จ",
-    "เพิ่ม Retry, Error Handling, Update Log และเริ่มใช้ Community License 1.0"
+    "เพิ่ม Export ทุก Instance, Instance ปัจจุบัน หรือ Tab ปัจจุบันเป็นไฟล์ .ewmbackup",
+    "เพิ่ม Import Instance, Tab และ Favorites แบบสร้างข้อมูลใหม่โดยไม่เขียนทับของเดิม",
+    "ตรวจ Manifest, จำนวนรายการและ SHA-256 พร้อมแยก Metadata ออกจาก Cookie, Login และ Profile"
   ],
   "releaseNotesEn": [
-    "Create a recovery backup and require a startup health check before confirming an update",
-    "Automatically roll back and restart the previous version when the updated app cannot start",
-    "Add retry, improved error handling, update logs, and Community License 1.0"
+    "Export all instances, the current instance, or the current tab to an .ewmbackup file",
+    "Import instances, tabs, and favorites as new data without replacing existing workspaces",
+    "Validate the manifest, item counts, and SHA-256 while keeping metadata separate from cookies, logins, and profiles"
   ]
 }
