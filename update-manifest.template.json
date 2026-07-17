@@ -6,13 +6,13 @@
   "size": 0,
   "priority": "recommended",
   "releaseNotesTh": [
-    "เพิ่มระบบ Official Public Update ผ่าน GitHub Releases",
-    "เพิ่ม Update now, Remind me later และ Skip this version",
-    "เพิ่มการตรวจ SHA-256 และ Update History"
+    "Test Release สำหรับตรวจสอบ Official Public Update จาก v1.7.0",
+    "ทดสอบการแจ้งเตือน ดาวน์โหลด ตรวจ SHA-256 และเรียก Updater",
+    "ทดสอบ Update History และเปิดโปรแกรมกลับหลังติดตั้ง"
   ],
   "releaseNotesEn": [
-    "Added Official Public Update through GitHub Releases",
-    "Added Update now, Remind me later, and Skip this version",
-    "Added SHA-256 verification and Update History"
+    "Test release for Official Public Update from v1.7.0",
+    "Tests notification, download, SHA-256 verification, and updater launch",
+    "Tests update history and automatic restart after installation"
   ]
 }
