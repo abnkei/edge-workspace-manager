@@ -1,18 +1,18 @@
 {
-  "version": "1.7.3",
+  "version": "1.7.4",
   "releaseDate": "2026-07-17T00:00:00Z",
   "downloadUrl": "https://github.com/abnkei/edge-workspace-manager/releases/latest/download/EdgeWorkspaceManager-win-x64.zip",
   "sha256": "GENERATED_BY_GITHUB_ACTIONS",
   "size": 0,
   "priority": "recommended",
   "releaseNotesTh": [
-    "Test Release สำหรับทดสอบ Auto Update จาก v1.7.2 แบบครบวงจร",
-    "ตรวจการแจ้งเตือน ดาวน์โหลด SHA-256 Updater และการเปิดกลับ",
-    "ตรวจการรักษา Tab, Instance, Login, Cookie และ Session หลังอัปเดต"
+    "แก้ Address Bar ให้แสดง URL ปัจจุบันหลัง Redirect, SPA และ Back/Forward",
+    "ป้องกัน Tab เบื้องหลังเขียนทับ URL และไม่รบกวนขณะผู้ใช้กำลังพิมพ์",
+    "เพิ่มหน้า About, MIT License และ Third-party notices ใน Release package"
   ],
   "releaseNotesEn": [
-    "Test release for end-to-end automatic update from v1.7.2",
-    "Validates notification, download, SHA-256, updater, and restart",
-    "Validates preservation of tabs, instances, login, cookies, and sessions"
+    "Keep the Address Bar synchronized after redirects, SPA navigation, and Back/Forward",
+    "Prevent background tabs from overwriting the focused URL or active user input",
+    "Add the redesigned About page, MIT License, and third-party notices to releases"
   ]
 }

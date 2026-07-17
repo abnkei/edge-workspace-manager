@@ -35,7 +35,7 @@ public static class AppInfo
             var value = Assembly.GetExecutingAssembly()
                 .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion
                 ?? Assembly.GetExecutingAssembly().GetName().Version?.ToString(3)
-                ?? "1.7.3";
+                ?? "1.7.4";
             var metadata = value.IndexOf('+');
             return metadata >= 0 ? value[..metadata] : value;
         }
@@ -43,6 +43,13 @@ public static class AppInfo
 
     public static IReadOnlyList<(string Version, string Date, string[] Changes)> ReleaseNotes { get; } =
     [
+        ("1.7.4", "17 กรกฎาคม 2026",
+        [
+            "แก้ Address Bar ให้แสดง URL ปัจจุบันหลัง Redirect, SPA และ Back/Forward",
+            "ป้องกัน Tab เบื้องหลังเขียนทับ URL และไม่รบกวนขณะผู้ใช้กำลังพิมพ์",
+            "เพิ่มหน้า About พร้อม Repository, Release, Support และ Build commit",
+            "เพิ่ม MIT License และ Third-party notices ในโปรแกรมและ Release package"
+        ]),
         ("1.7.3", "17 กรกฎาคม 2026",
         [
             "Test Release สำหรับทดสอบ Auto Update จาก v1.7.2 แบบครบวงจร",
