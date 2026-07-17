@@ -84,7 +84,14 @@ public sealed class UpdateService
     }
 
     private static bool IsNewer(string candidate, string current) =>
-        Version.TryParse(candidate, out var next) && Version.TryParse(current, out var installed) && next > installed;
+        Version.TryParse(NumericVersion(candidate), out var next) &&
+        Version.TryParse(NumericVersion(current), out var installed) && next > installed;
+
+    private static string NumericVersion(string value)
+    {
+        var metadata = value.IndexOfAny(['+', '-']);
+        return metadata >= 0 ? value[..metadata] : value;
+    }
 
     private static HttpClient CreateClient()
     {

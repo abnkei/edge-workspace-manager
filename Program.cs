@@ -15,13 +15,27 @@ internal static class Program
 
 public static class AppInfo
 {
-    public static string Version => Assembly.GetExecutingAssembly()
-        .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion
-        ?? Assembly.GetExecutingAssembly().GetName().Version?.ToString(3)
-        ?? "1.7.1";
+    public static string Version
+    {
+        get
+        {
+            var value = Assembly.GetExecutingAssembly()
+                .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion
+                ?? Assembly.GetExecutingAssembly().GetName().Version?.ToString(3)
+                ?? "1.7.2";
+            var metadata = value.IndexOf('+');
+            return metadata >= 0 ? value[..metadata] : value;
+        }
+    }
 
     public static IReadOnlyList<(string Version, string Date, string[] Changes)> ReleaseNotes { get; } =
     [
+        ("1.7.2", "17 กรกฎาคม 2026",
+        [
+            "แก้การตรวจอัปเดตที่เปรียบเทียบเวอร์ชันผิดเมื่อมี Git commit metadata",
+            "ตัด `+commit hash` ออกก่อแสดงและก่อเปรียบเทียบเวอร์ชัน",
+            "ปิดการเติม Source Revision ใน Informational Version ของ Build ใหม่"
+        ]),
         ("1.7.1", "17 กรกฎาคม 2026",
         [
             "Test Release สำหรับตรวจสอบ Official Public Update จาก v1.7.0",
