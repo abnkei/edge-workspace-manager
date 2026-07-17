@@ -48,7 +48,7 @@
 1. ติดตั้ง .NET 8 SDK บน Windows
 2. แตก ZIP
 3. ดับเบิลคลิก `build.bat`
-4. ไฟล์จะอยู่ที่ `releases\v1.7.1\EdgeWorkspaceManager.exe`
+4. ไฟล์จะอยู่ที่ `releases\v1.7.2\EdgeWorkspaceManager.exe`
 
 เลขเวอร์ชันจะแสดงบนแถบสถานะด้านล่างของโปรแกรม กดที่เลขเวอร์ชันเพื่อดูรายการอัปเดตทั้งหมด
 
