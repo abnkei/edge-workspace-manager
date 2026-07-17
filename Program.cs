@@ -18,10 +18,16 @@ public static class AppInfo
     public static string Version => Assembly.GetExecutingAssembly()
         .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion
         ?? Assembly.GetExecutingAssembly().GetName().Version?.ToString(3)
-        ?? "1.7.0";
+        ?? "1.7.1";
 
     public static IReadOnlyList<(string Version, string Date, string[] Changes)> ReleaseNotes { get; } =
     [
+        ("1.7.1", "17 กรกฎาคม 2026",
+        [
+            "Test Release สำหรับตรวจสอบ Official Public Update จาก v1.7.0",
+            "ทดสอบการแจ้งเตือน ดาวน์โหลด ตรวจ SHA-256 และเรียก Updater",
+            "ทดสอบการบันทึก Update History และเปิดโปรแกรมกลับหลังติดตั้ง"
+        ]),
         ("1.7.0", "17 กรกฎาคม 2026",
         [
             "เพิ่ม Official Public Update ผ่าน GitHub Releases แบบไม่ต้อง Login",
