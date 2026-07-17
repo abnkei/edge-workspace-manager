@@ -37,7 +37,13 @@
 
 ### Live Theme Switching without Restart
 
+Tracking issue: [#16 Dark Mode colors are inconsistent across toolbar, instances, and tabs](https://github.com/abnkei/edge-workspace-manager/issues/16)
+
 - เปลี่ยน Theme ระหว่าง `Light`, `Dark` และ `Use Windows setting` ได้ทันทีหลังบันทึก Settings
+- ใช้ Semantic Dark Palette เดียวกันกับ Toolbar, Container, Instance strip, Browser tab strip, Dialog, Grid และ Status bar
+- ลด Saturation ของสี Instance ใน Dark Mode และใช้ Accent/Underline แสดง Focus แทนการเร่งความสว่างทั้ง Tab
+- ทำปุ่ม `+` ให้กะทัดรัดและแยกจาก Content Tab อย่างชัดเจน
+- รองรับ Dark Windows Title Bar ผ่าน DWM บน Windows ที่รองรับ
 - อัปเดต Toolbar, Address Bar, Instance/Tab bar, Status bar, Menu, Dialog และหน้าต่าง Browser Tools ที่เปิดอยู่
 - ไม่ Restart โปรแกรม ไม่สร้าง WebView ใหม่ และไม่ Reload หน้าเว็บ
 - รักษา URL, Login, Cookie, Session, Focused Tab และตำแหน่ง Scroll ของหน้าเว็บเดิม
@@ -51,6 +57,8 @@
 - จำนวน WebView, Process, Instance และ Tab ต้องไม่เปลี่ยนจากการสลับ Theme
 - Login, Session, URL ปัจจุบัน และสถานะ Pin ต้องคงเดิม
 - ไม่มีพื้นหลังหรือข้อความสีเดิมค้างใน Menu, Dialog, Grid หรือ Tab ที่กำลัง Focus
+- ไม่มีพื้นสีอ่อนค้างรอบ Instance strip หรือ Browser tab strip และสี Instance ต้องไม่ดูเรืองเกินไป
+- Dark Mode ของโปรแกรมต้องไม่เปลี่ยนสีหน้าเว็บไซต์โดยอัตโนมัติ
 - การสลับ Theme หลายครั้งติดต่อกันต้องไม่ทำให้ Event ซ้ำ Memory เพิ่มต่อเนื่อง หรือ UI ค้าง
 
 ### Password-encrypted Full Local Backup (Experimental)
