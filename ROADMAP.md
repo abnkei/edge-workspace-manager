@@ -4,6 +4,51 @@
 
 ยังไม่ได้กำหนดหัวข้อและหมายเลขเวอร์ชันสำหรับอัปเดตถัดไป
 
+### Requested: Refresh All Open Tabs in Current Instance
+
+- เพิ่มปุ่มบน Toolbar หรือเมนู Instance สำหรับ Refresh Web Tab ที่เปิดอยู่ทั้งหมดใน Instance ปัจจุบัน
+- ใช้ Tooltip `รีเฟรช Tab ที่เปิดอยู่ทั้งหมด` / `Refresh all open tabs`
+- Refresh เฉพาะ Tab ที่มี WebView เปิดอยู่จริง โดยไม่เปิด Tab ที่ปิดหรือสร้าง WebView ใหม่
+- ข้าม External Program Tab, ปุ่ม `+`, Tab ที่กำลังปิด และ WebView ที่ยัง Initialize ไม่สำเร็จ
+- Refresh แบบทยอยเป็นคิวหรือจำกัดจำนวนพร้อมกัน เพื่อลด CPU, Memory และ Network spike
+- แสดง Progress บน Status bar เช่น `กำลังรีเฟรช 3/8 Tab` และสรุปจำนวนสำเร็จ/ล้มเหลว
+- ป้องกันการกดคำสั่งซ้ำระหว่างคิวเดิมกำลังทำงาน และมีคำสั่งยกเลิกหากใช้เวลานาน
+- รักษาลำดับ Tab, Focused Tab, Pin, Login, Cookie, Profile และ Session เดิม
+
+### Refresh All Open Tabs Acceptance Criteria
+
+- กดหนึ่งครั้งแล้ว Web Tab ที่เปิดอยู่ทั้งหมดใน Instance ปัจจุบันต้องได้รับคำสั่ง Refresh
+- Tab ใน Instance อื่นและ Tab ที่ปิดอยู่ต้องไม่ถูกเปิดหรือ Refresh
+- External Program Tab และปุ่ม `+` ต้องไม่ได้รับผลกระทบ
+- โปรแกรมต้องยังตอบสนองระหว่าง Refresh และไม่ส่งคำสั่งซ้ำให้ Tab เดียวกันในหนึ่งรอบ
+- หากบางหน้า Refresh ไม่สำเร็จ ต้องทำ Tab อื่นต่อและแสดงผลลัพธ์โดยไม่ปิดโปรแกรม
+- หลัง Refresh ต้องยังอยู่ที่ Instance และ Tab ที่ผู้ใช้กำลัง Focus ก่อนเริ่มคำสั่ง
+
+### Requested: Responsive Edge-style Web Tab Strip with Favicons
+
+- แสดง Web Tab ปกติทุกอันใน Instance ปัจจุบันด้วยความกว้างเท่ากันในเวลาเดียวกัน คล้าย Microsoft Edge
+- คำนวณความกว้างใหม่เมื่อ Resize หน้าต่าง, เพิ่ม, ปิด, Pin, Unpin หรือ Rearrange Tab โดย Tab ทุกอันต้องย่อหรือขยายพร้อมกัน
+- กำหนดความกว้างสูงสุดเมื่อมี Tab จำนวนน้อย และลดความกว้างลงอย่างเท่า ๆ กันเมื่อพื้นที่แคบลง
+- แสดง Favicon ของหน้าเว็บไว้หน้าชื่อ Tab และอัปเดตเมื่อมีการ Navigate หรือ Favicon ของหน้าเปลี่ยน
+- ใช้ไอคอนมาตรฐานสำหรับหน้าเว็บที่ไม่มี Favicon, WebView ที่ยังโหลดไม่เสร็จ และ External Program Tab
+- เมื่อพื้นที่เริ่มแคบ ให้ย่อข้อความชื่อ Tab ก่อน และเมื่อแคบมากให้แสดง Favicon พร้อม Tooltip ที่มีชื่อเต็มและ URL
+- ปุ่ม New Tab `+` ต้องมีขนาดคงที่ แยกจาก Web Tab และไม่ถูกนำมาคำนวณเป็น Tab เนื้อหา
+- ไม่แสดงปุ่มลูกศรซ้าย–ขวาสำหรับเลื่อน Tab แบบเดิมของ WinForms
+- เมื่อจำนวน Tab มากเกินกว่าความกว้างขั้นต่ำที่ใช้งานได้ ให้เข้าถึง Tab ทั้งหมดผ่านเมนู Tab overflow/dropdown แทนลูกศร
+- รักษา Focus, Pin, Close, Drag/Rearrange และ Context Menu เดิม รวมถึงไม่ Reload WebView ระหว่างปรับขนาด
+- Cache และ Dispose รูป Favicon อย่างปลอดภัย โดยการโหลดไอคอนต้องไม่ทำให้ UI ค้างหรือเกิด Memory leak
+- รองรับ Windows DPI Scaling, Light/Dark Theme และแสดงสถานะ Focused Tab ให้มองเห็นชัดเจนทุกขนาด
+
+### Responsive Web Tab Strip Acceptance Criteria
+
+- Web Tab ปกติที่แสดงพร้อมกันต้องมีความกว้างเท่ากัน และปรับขนาดพร้อมกันทันทีเมื่อหน้าต่างเปลี่ยนขนาด
+- Tab strip ต้องไม่แสดงลูกศรซ้าย–ขวา แม้พื้นที่หน้าต่างไม่พอ
+- ผู้ใช้ต้องเข้าถึง Tab ที่ล้นพื้นที่ได้จากเมนู overflow โดยไม่สูญเสียลำดับหรือ Focus เดิม
+- Favicon ต้องตรงกับหน้าเว็บปัจจุบันหลัง Navigate และใช้ไอคอนสำรองได้เมื่อเว็บไซต์ไม่มี Favicon
+- เมื่อ Tab แคบ ชื่อสามารถถูกตัดได้ แต่ต้องมี Favicon และ Tooltip สำหรับดูชื่อเต็มกับ URL
+- การ Resize, Pin, Unpin, Close หรือ Rearrange ต้องไม่สร้าง WebView ใหม่ ไม่ Reload หน้า และไม่กระทบ Login หรือ Session
+- การเปิด Tab จำนวนมากและเปลี่ยน Favicon ซ้ำต้องไม่ทำให้ UI ค้างหรือสะสม Image resource
+
 ## Completed in v2.1.2
 
 ### Single Instance Protection
