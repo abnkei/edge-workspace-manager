@@ -11,6 +11,7 @@ public sealed class MainForm : Form
     private const int NewTabButtonWidth = 38;
     private const int MaximumBrowserTabWidth = 220;
     private const string NewTabButtonName = "BrowserNewTabButton";
+    private const string BrowserTabControlName = "BrowserTabs";
     private static readonly object NewTabButtonTag = new();
     private WorkspaceConfig _config = ConfigStore.Load();
     private readonly TabControl _workspaceTabs = new() { Dock = DockStyle.Fill };
@@ -29,6 +30,7 @@ public sealed class MainForm : Form
     private readonly BindingList<DownloadRecord> _downloads = new();
     private readonly Dictionary<TabControl, int> _tabDragStart = new();
     private readonly Dictionary<TabPage, Image> _tabFavicons = new();
+    private readonly HashSet<TabControl> _updatingBrowserTabLayouts = [];
     private readonly PowerAwake _powerAwake = new();
     private readonly UpdateService _updateService = new();
     private readonly System.Windows.Forms.Timer _awakeTimer = new() { Interval = 1000 };
@@ -339,7 +341,7 @@ public sealed class MainForm : Form
             {
                 var outer = new TabPage(workspace.Name) { Tag = workspace, ToolTipText = workspace.Name };
                 var inner = CreateBrowserTabControl();
-                outer.Controls.Add(inner);
+                outer.Controls.Add(CreateBrowserTabHost(inner));
                 _workspaceTabs.TabPages.Add(outer);
                 var tabs = workspace.Tabs.Where(tab =>
                     !_config.RestoreLastSession ||
@@ -372,8 +374,8 @@ public sealed class MainForm : Form
             SizeMode = TabSizeMode.Fixed,
             ShowToolTips = true
         };
+        inner.Name = BrowserTabControlName;
         inner.AllowDrop = true;
-        inner.Resize += (_, _) => UpdateBrowserTabLayout(inner);
         inner.DrawItem += DrawBrowserTab;
         inner.MouseDown += BrowserTabsMouseDown;
         inner.MouseMove += BrowserTabsMouseMove;
@@ -385,26 +387,56 @@ public sealed class MainForm : Form
             _addressUserEditing = false;
             SyncAddress();
         };
-        EnsureNewTabButton(inner);
         return inner;
+    }
+
+    private Control CreateBrowserTabHost(TabControl tabs)
+    {
+        var host = new Panel { Dock = DockStyle.Fill };
+        var button = new Button
+        {
+            Name = NewTabButtonName,
+            Text = "+",
+            Width = NewTabButtonWidth,
+            Height = 28,
+            Anchor = AnchorStyles.Top | AnchorStyles.Right,
+            TabStop = false,
+            AccessibleName = L.T("เปิด Tab ใหม่", "New tab")
+        };
+        button.Click += async (_, _) => await AddNewTabAsync();
+        new ToolTip().SetToolTip(button, L.T("เปิด Tab ใหม่ (Ctrl+T)", "New tab (Ctrl+T)"));
+        host.Controls.Add(tabs);
+        host.Controls.Add(button);
+        host.Resize += (_, _) => UpdateBrowserTabLayout(tabs);
+        button.BringToFront();
+        ThemeManager.Apply(button);
+        return host;
     }
 
     private void UpdateBrowserTabLayout(TabControl tabs)
     {
-        if (tabs.IsDisposed) return;
-        var button = tabs.Controls.Find(NewTabButtonName, false).FirstOrDefault() as Button;
-        if (button is not null)
+        if (tabs.IsDisposed || !_updatingBrowserTabLayouts.Add(tabs)) return;
+        try
         {
-            button.Location = new Point(Math.Max(0, tabs.ClientSize.Width - button.Width - 3), 1);
-            button.BringToFront();
-        }
+            var button = tabs.Parent?.Controls.Find(NewTabButtonName, false).FirstOrDefault() as Button;
+            if (button is not null)
+            {
+                var location = new Point(Math.Max(0, tabs.ClientSize.Width - button.Width - 3), 1);
+                if (button.Location != location) button.Location = location;
+                button.BringToFront();
+            }
 
-        var tabCount = Math.Max(1, tabs.TabCount);
-        var availableWidth = Math.Max(tabCount, tabs.ClientSize.Width - NewTabButtonWidth - 12);
-        var width = Math.Clamp(availableWidth / tabCount, 1, MaximumBrowserTabWidth);
-        var itemSize = new Size(width, 30);
-        if (tabs.ItemSize != itemSize) tabs.ItemSize = itemSize;
-        tabs.Invalidate();
+            var tabCount = Math.Max(1, tabs.TabCount);
+            var availableWidth = Math.Max(tabCount, tabs.ClientSize.Width - NewTabButtonWidth - 12);
+            var width = Math.Clamp(availableWidth / tabCount, 1, MaximumBrowserTabWidth);
+            var itemSize = new Size(width, 30);
+            if (tabs.ItemSize != itemSize) tabs.ItemSize = itemSize;
+            tabs.Invalidate();
+        }
+        finally
+        {
+            _updatingBrowserTabLayouts.Remove(tabs);
+        }
     }
 
     private async Task RefreshAllTabsInCurrentInstanceAsync()
@@ -598,24 +630,7 @@ public sealed class MainForm : Form
 
     private void EnsureNewTabButton(TabControl inner)
     {
-        if (inner.Controls.Find(NewTabButtonName, false).FirstOrDefault() is not Button button)
-        {
-            button = new Button
-            {
-                Name = NewTabButtonName,
-                Text = "+",
-                Width = NewTabButtonWidth,
-                Height = 28,
-                Anchor = AnchorStyles.Top | AnchorStyles.Right,
-                TabStop = false,
-                AccessibleName = L.T("เปิด Tab ใหม่", "New tab")
-            };
-            button.Click += async (_, _) => await AddNewTabAsync();
-            new ToolTip().SetToolTip(button, L.T("เปิด Tab ใหม่ (Ctrl+T)", "New tab (Ctrl+T)"));
-            inner.Controls.Add(button);
-            button.BringToFront();
-            ThemeManager.Apply(button);
-        }
+        if (inner.Parent?.Controls.Find(NewTabButtonName, false).FirstOrDefault() is not Button) return;
         UpdateBrowserTabLayout(inner);
     }
 
@@ -1302,7 +1317,7 @@ public sealed class MainForm : Form
         tools.ShowDialog(this);
         ThemeManager.Configure(_config.Settings.Theme);
         ApplyTheme();
-        foreach (var inner in _workspaceTabs.TabPages.Cast<TabPage>().SelectMany(page => page.Controls.OfType<TabControl>()))
+        foreach (var inner in _workspaceTabs.TabPages.Cast<TabPage>().Select(FindBrowserTabs).Where(tabs => tabs is not null).Select(tabs => tabs!))
             inner.Invalidate();
     }
 
@@ -1348,7 +1363,7 @@ public sealed class MainForm : Form
         _addressSuggestions.BackColor = ThemeManager.InputBack;
         _addressSuggestions.ForeColor = ThemeManager.Foreground;
         foreach (var outer in _workspaceTabs.TabPages.Cast<TabPage>())
-            if (outer.Controls.OfType<TabControl>().FirstOrDefault() is { } inner)
+            if (FindBrowserTabs(outer) is { } inner)
             {
                 inner.Invalidate();
                 foreach (var browser in inner.TabPages.Cast<TabPage>().SelectMany(page => page.Controls.OfType<WebView2>()))
@@ -1406,13 +1421,16 @@ public sealed class MainForm : Form
 
     private void GoBack() { var browser = CurrentWebView(); if (browser?.CanGoBack == true) browser.GoBack(); }
     private void GoForward() { var browser = CurrentWebView(); if (browser?.CanGoForward == true) browser.GoForward(); }
-    private TabControl? CurrentInnerTabs() => _workspaceTabs.SelectedTab?.Controls.OfType<TabControl>().FirstOrDefault();
+    private static TabControl? FindBrowserTabs(Control? parent) =>
+        parent?.Controls.Find(BrowserTabControlName, true).OfType<TabControl>().FirstOrDefault();
+
+    private TabControl? CurrentInnerTabs() => FindBrowserTabs(_workspaceTabs.SelectedTab);
     private WebView2? CurrentWebView() => CurrentInnerTabs()?.SelectedTab?.Controls.OfType<WebView2>().FirstOrDefault();
     private BrowserWorkspace? CurrentWorkspace() => _workspaceTabs.SelectedTab?.Tag as BrowserWorkspace;
     private BrowserTab? CurrentTab() => CurrentInnerTabs()?.SelectedTab?.Tag as BrowserTab;
 
     private BrowserWorkspace? WorkspaceFor(TabControl inner) => _workspaceTabs.TabPages.Cast<TabPage>()
-        .FirstOrDefault(p => p.Controls.Contains(inner))?.Tag as BrowserWorkspace;
+        .FirstOrDefault(page => ReferenceEquals(FindBrowserTabs(page), inner))?.Tag as BrowserWorkspace;
 
     private void SelectWorkspace(BrowserWorkspace workspace)
     {
@@ -1511,7 +1529,7 @@ public sealed class MainForm : Form
         }
 
         var tabPages = allInstances
-            ? _workspaceTabs.TabPages.Cast<TabPage>().SelectMany(page => page.Controls.OfType<TabControl>().SelectMany(tabs => tabs.TabPages.Cast<TabPage>()))
+            ? _workspaceTabs.TabPages.Cast<TabPage>().SelectMany(page => FindBrowserTabs(page)?.TabPages.Cast<TabPage>() ?? [])
             : CurrentInnerTabs()?.TabPages.Cast<TabPage>() ?? Enumerable.Empty<TabPage>();
         foreach (var page in tabPages)
             if (page.Controls.OfType<WebView2>().FirstOrDefault() is { } browser && browser.Source is not null)
@@ -1706,7 +1724,7 @@ public sealed class MainForm : Form
             openTabIds[workspace.Id] = new List<string>();
         }
         foreach (var outer in _workspaceTabs.TabPages.Cast<TabPage>())
-            if (outer.Controls.OfType<TabControl>().FirstOrDefault() is { } inner)
+            if (FindBrowserTabs(outer) is { } inner)
                 foreach (var page in inner.TabPages.Cast<TabPage>())
                     if (page.Tag is BrowserTab tab)
                     {

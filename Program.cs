@@ -72,7 +72,7 @@ public static class AppInfo
             var value = Assembly.GetExecutingAssembly()
                 .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion
                 ?? Assembly.GetExecutingAssembly().GetName().Version?.ToString(3)
-                ?? "2.1.3";
+                ?? "2.1.4";
             var metadata = value.IndexOf('+');
             return metadata >= 0 ? value[..metadata] : value;
         }
@@ -80,6 +80,13 @@ public static class AppInfo
 
     public static IReadOnlyList<(string Version, string Date, string[] Changes)> ReleaseNotes { get; } =
     [
+        ("2.1.4", "19 กรกฎาคม 2026",
+        [
+            "แก้โปรแกรมปิดตัวระหว่างเริ่มต้นจากการเพิ่มปุ่ม New Tab ลงใน WinForms TabControl โดยตรง",
+            "ย้ายปุ่ม + ไปไว้ใน Container ที่รองรับและยังคงแยกขนาดคงที่ทางขวาของ Web Tab",
+            "ป้องกัน Resize และ ItemSize เรียกวนซ้ำจนเกิด Stack Overflow 0xc00000fd",
+            "รักษา Responsive Tab width, Favicon, Refresh All Tabs และ Session เดิมจาก v2.1.3"
+        ]),
         ("2.1.3", "19 กรกฎาคม 2026",
         [
             "เพิ่มปุ่ม Refresh All Tabs สำหรับรีเฟรช Web Tab ที่เปิดอยู่ทั้งหมดใน Instance ปัจจุบันแบบทยอยทำงาน",

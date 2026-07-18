@@ -1,18 +1,18 @@
 {
-  "version": "2.1.3",
+  "version": "2.1.4",
   "releaseDate": "2026-07-19T00:00:00Z",
   "downloadUrl": "https://github.com/abnkei/edge-workspace-manager/releases/latest/download/EdgeWorkspaceManager-win-x64.zip",
   "sha256": "GENERATED_BY_GITHUB_ACTIONS",
   "size": 0,
   "priority": "recommended",
   "releaseNotesTh": [
-    "เพิ่มปุ่ม Refresh All Tabs สำหรับรีเฟรช Web Tab ทั้งหมดใน Instance ปัจจุบันพร้อม Progress",
-    "ปรับ Web Tab ให้กว้างเท่ากันและย่อขยายพร้อมกันโดยไม่มีลูกศรเลื่อน",
-    "เพิ่ม Favicon หน้า Tab Title พร้อมไอคอนสำรองและปุ่ม New Tab แบบแยกขนาดคงที่"
+    "แก้โปรแกรมปิดตัวระหว่างเริ่มต้นจากการเพิ่มปุ่ม New Tab ลงใน TabControl โดยตรง",
+    "ย้ายปุ่ม + ไปไว้ใน Container ที่ WinForms รองรับและยังคงขนาดคงที่",
+    "รักษา Responsive Tab, Favicon, Refresh All Tabs และ Session เดิม"
   ],
   "releaseNotesEn": [
-    "Refresh every open web tab in the current instance with progress and per-tab failure isolation",
-    "Keep web tabs equally wide and resize them together without native scroll arrows",
-    "Show website favicons with a fallback icon and a separate fixed-width New Tab button"
+    "Fix the startup crash caused by adding the New Tab button directly to a WinForms TabControl",
+    "Host the fixed-width New Tab button in a supported container outside the TabControl",
+    "Preserve responsive tabs, favicons, Refresh All Tabs, and existing sessions"
   ]
 }

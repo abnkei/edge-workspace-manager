@@ -4,6 +4,17 @@
 
 ยังไม่ได้กำหนดหัวข้อและหมายเลขเวอร์ชันสำหรับอัปเดตถัดไป
 
+## Completed in v2.1.4
+
+### Critical Startup Crash Hotfix
+
+- แก้ `System.ArgumentException: Cannot add 'Button' to TabControl` ที่ทำให้ v2.1.3 เปิด Workspace ไม่สำเร็จ
+- ย้ายปุ่ม New Tab `+` ไปไว้ใน Container ภายนอก `TabControl` ตามข้อกำหนดของ WinForms
+- คงปุ่ม `+` แบบขนาดคงที่และคำนวณพื้นที่ Responsive Web Tab โดยหักพื้นที่ปุ่มออก
+- ปรับการค้นหา Browser TabControl ให้รองรับโครงสร้าง Container ใหม่ใน Theme, Session, Search และ Workspace management
+- ป้องกันวงจร `Resize → ItemSize → Resize` ด้วย Re-entrancy Guard และให้ Container เป็นผู้เริ่มคำนวณ Layout เพียงจุดเดียว
+- ไม่แก้หรือล้าง Workspace, Profile, Cookie, Login หรือ Session ของผู้ใช้
+
 ## Completed in v2.1.3
 
 ### Requested: Refresh All Open Tabs in Current Instance
