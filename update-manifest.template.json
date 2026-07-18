@@ -1,18 +1,18 @@
 {
-  "version": "2.1.1",
+  "version": "2.1.2",
   "releaseDate": "2026-07-18T00:00:00Z",
   "downloadUrl": "https://github.com/abnkei/edge-workspace-manager/releases/latest/download/EdgeWorkspaceManager-win-x64.zip",
   "sha256": "GENERATED_BY_GITHUB_ACTIONS",
   "size": 0,
   "priority": "recommended",
   "releaseNotesTh": [
-    "เพิ่มหน้าต่างยืนยันก่อนปิดโปรแกรม พร้อมบันทึก Session และไม่ขวาง Updater",
-    "เพิ่มปุ่ม + ต่อจาก Tab สุดท้ายของทุก Instance สำหรับเปิด Tab ใหม่",
-    "ปุ่ม + รองรับ Mouse, Keyboard และไม่รวมใน Session, Backup หรือการลากเรียง Tab"
+    "เพิ่ม Single Instance Protection ป้องกันการเปิดโปรแกรมซ้ำและแจ้งเตือนโดยไม่กระทบหน้าต่างเดิม",
+    "ปรับความกว้าง Instance Tab ด้านบนตามชื่ออัตโนมัติ พร้อม Padding และ Tooltip",
+    "รองรับการเปลี่ยนชื่อ Instance, DPI Scaling, สี Instance และการลากเรียงตามเดิม"
   ],
   "releaseNotesEn": [
-    "Confirm before closing the application, save the session, and never block the updater",
-    "Add a + button after the final tab in every instance for convenient new-tab creation",
-    "Support mouse and keyboard access without including the + button in sessions, backups, or tab ordering"
+    "Prevent duplicate application launches with Single Instance protection while preserving the existing window",
+    "Automatically size top Instance tabs from their names with padding and full-name tooltips",
+    "Preserve instance renaming, DPI scaling, colors, focus, and drag ordering behavior"
   ]
 }
