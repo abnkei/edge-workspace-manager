@@ -8,6 +8,9 @@ namespace EdgeWorkspaceManager;
 public sealed class MainForm : Form
 {
     private const int CloseButtonWidth = 22;
+    private const int NewTabButtonWidth = 38;
+    private const int MaximumBrowserTabWidth = 220;
+    private const string NewTabButtonName = "BrowserNewTabButton";
     private static readonly object NewTabButtonTag = new();
     private WorkspaceConfig _config = ConfigStore.Load();
     private readonly TabControl _workspaceTabs = new() { Dock = DockStyle.Fill };
@@ -25,6 +28,7 @@ public sealed class MainForm : Form
     private readonly Dictionary<string, CoreWebView2Environment> _environments = new();
     private readonly BindingList<DownloadRecord> _downloads = new();
     private readonly Dictionary<TabControl, int> _tabDragStart = new();
+    private readonly Dictionary<TabPage, Image> _tabFavicons = new();
     private readonly PowerAwake _powerAwake = new();
     private readonly UpdateService _updateService = new();
     private readonly System.Windows.Forms.Timer _awakeTimer = new() { Interval = 1000 };
@@ -33,10 +37,13 @@ public sealed class MainForm : Form
     private bool _addressUserEditing;
     private Button? _windowPickerButton;
     private Button? _pinTabButton;
+    private Button? _refreshAllTabsButton;
     private readonly ToolTip _pinTabToolTip = new();
     private bool _isReloading;
     private bool _allowCloseWithoutConfirmation;
     private bool _closeConfirmationOpen;
+    private bool _refreshingAllTabs;
+    private CancellationTokenSource? _refreshAllTabsCancellation;
 
     public MainForm()
     {
@@ -94,6 +101,8 @@ public sealed class MainForm : Form
         }
         if (e.Cancel) return;
         SaveSession();
+        foreach (var favicon in _tabFavicons.Values) favicon.Dispose();
+        _tabFavicons.Clear();
         _powerAwake.Dispose();
     }
 
@@ -104,8 +113,8 @@ public sealed class MainForm : Form
         root.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
         root.RowStyles.Add(new RowStyle(SizeType.Absolute, 26));
 
-        var bar = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 14, Padding = new Padding(6) };
-        for (var i = 0; i < 11; i++) bar.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 42));
+        var bar = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 15, Padding = new Padding(6) };
+        for (var i = 0; i < 12; i++) bar.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 42));
         bar.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
         bar.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 80));
         bar.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 145));
@@ -126,6 +135,10 @@ public sealed class MainForm : Form
         _pinTabButton = MakeButton("📌", (_, _) => ToggleCurrentPinnedTab(), L.T("ปักหมุด/เลิกปักหมุด Tab ปัจจุบัน (Ctrl+Shift+P)", "Pin/Unpin current tab (Ctrl+Shift+P)"));
         _pinTabButton.AccessibleName = L.T("ปักหมุด Tab ปัจจุบัน", "Pin current tab");
         bar.Controls.Add(_pinTabButton, 10, 0);
+        _refreshAllTabsButton = MakeButton("⟳⟳", async (_, _) => await RefreshAllTabsInCurrentInstanceAsync(),
+            L.T("รีเฟรช Tab ที่เปิดอยู่ทั้งหมดใน Instance ปัจจุบัน", "Refresh all open tabs in the current instance"));
+        _refreshAllTabsButton.AccessibleName = L.T("รีเฟรช Tab ทั้งหมด", "Refresh all tabs");
+        bar.Controls.Add(_refreshAllTabsButton, 11, 0);
         _address.KeyDown += AddressKeyDown;
         _address.TextChanged += (_, _) =>
         {
@@ -142,9 +155,9 @@ public sealed class MainForm : Form
                 SyncAddress();
             }
         };
-        bar.Controls.Add(_address, 11, 0);
-        bar.Controls.Add(MakeButton(L.T("ไป", "Go"), (_, _) => NavigateAddress()), 12, 0);
-        bar.Controls.Add(MakeButton(L.T("จัดการ Tab", "Manage tabs"), async (_, _) => await EditCurrentWorkspaceAsync(), width: 135), 13, 0);
+        bar.Controls.Add(_address, 12, 0);
+        bar.Controls.Add(MakeButton(L.T("ไป", "Go"), (_, _) => NavigateAddress()), 13, 0);
+        bar.Controls.Add(MakeButton(L.T("จัดการ Tab", "Manage tabs"), async (_, _) => await EditCurrentWorkspaceAsync(), width: 135), 14, 0);
 
         _workspaceTabs.SelectedIndexChanged += (_, _) =>
         {
@@ -355,11 +368,12 @@ public sealed class MainForm : Form
             Dock = DockStyle.Fill,
             DrawMode = TabDrawMode.OwnerDrawFixed,
             Padding = new Point(CloseButtonWidth, 4),
-            ItemSize = new Size(190, 30),
-            SizeMode = TabSizeMode.Normal,
+            ItemSize = new Size(MaximumBrowserTabWidth, 30),
+            SizeMode = TabSizeMode.Fixed,
             ShowToolTips = true
         };
         inner.AllowDrop = true;
+        inner.Resize += (_, _) => UpdateBrowserTabLayout(inner);
         inner.DrawItem += DrawBrowserTab;
         inner.MouseDown += BrowserTabsMouseDown;
         inner.MouseMove += BrowserTabsMouseMove;
@@ -371,15 +385,128 @@ public sealed class MainForm : Form
             _addressUserEditing = false;
             SyncAddress();
         };
-        inner.KeyDown += (_, e) =>
-        {
-            if (!ReferenceEquals(inner.SelectedTab?.Tag, NewTabButtonTag) ||
-                (e.KeyCode != Keys.Enter && e.KeyCode != Keys.Space)) return;
-            e.Handled = true;
-            e.SuppressKeyPress = true;
-            _ = AddNewTabAsync();
-        };
+        EnsureNewTabButton(inner);
         return inner;
+    }
+
+    private void UpdateBrowserTabLayout(TabControl tabs)
+    {
+        if (tabs.IsDisposed) return;
+        var button = tabs.Controls.Find(NewTabButtonName, false).FirstOrDefault() as Button;
+        if (button is not null)
+        {
+            button.Location = new Point(Math.Max(0, tabs.ClientSize.Width - button.Width - 3), 1);
+            button.BringToFront();
+        }
+
+        var tabCount = Math.Max(1, tabs.TabCount);
+        var availableWidth = Math.Max(tabCount, tabs.ClientSize.Width - NewTabButtonWidth - 12);
+        var width = Math.Clamp(availableWidth / tabCount, 1, MaximumBrowserTabWidth);
+        var itemSize = new Size(width, 30);
+        if (tabs.ItemSize != itemSize) tabs.ItemSize = itemSize;
+        tabs.Invalidate();
+    }
+
+    private async Task RefreshAllTabsInCurrentInstanceAsync()
+    {
+        if (_refreshingAllTabs)
+        {
+            _refreshAllTabsCancellation?.Cancel();
+            return;
+        }
+        if (CurrentInnerTabs() is not { } inner) return;
+        var selectedPage = inner.SelectedTab;
+        var browsers = inner.TabPages.Cast<TabPage>()
+            .Select(page => page.Controls.OfType<WebView2>().FirstOrDefault())
+            .Where(browser => browser?.CoreWebView2 is not null)
+            .Select(browser => browser!)
+            .ToList();
+        if (browsers.Count == 0)
+        {
+            _status.Text = L.T("ไม่มี Web Tab ที่พร้อมรีเฟรช", "No web tabs are ready to refresh");
+            return;
+        }
+
+        _refreshingAllTabs = true;
+        _refreshAllTabsCancellation = new CancellationTokenSource();
+        var cancellationToken = _refreshAllTabsCancellation.Token;
+        if (_refreshAllTabsButton is not null) _refreshAllTabsButton.Text = "■";
+        var succeeded = 0;
+        var failed = 0;
+        try
+        {
+            for (var index = 0; index < browsers.Count; index++)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                _status.Text = L.T(
+                    $"กำลังรีเฟรช Tab {index + 1}/{browsers.Count}",
+                    $"Refreshing tab {index + 1}/{browsers.Count}");
+                try
+                {
+                    browsers[index].Reload();
+                    succeeded++;
+                }
+                catch
+                {
+                    failed++;
+                }
+                await Task.Delay(75, cancellationToken);
+            }
+            if (ReferenceEquals(inner, CurrentInnerTabs()) && selectedPage is not null && inner.TabPages.Contains(selectedPage))
+                inner.SelectedTab = selectedPage;
+            _status.Text = failed == 0
+                ? L.T($"รีเฟรชครบ {succeeded} Tab แล้ว", $"Refreshed {succeeded} tabs")
+                : L.T($"รีเฟรชสำเร็จ {succeeded} Tab, ไม่สำเร็จ {failed} Tab", $"Refreshed {succeeded} tabs; {failed} failed");
+        }
+        catch (OperationCanceledException)
+        {
+            _status.Text = L.T($"ยกเลิกแล้วหลังรีเฟรช {succeeded} Tab", $"Cancelled after refreshing {succeeded} tabs");
+        }
+        finally
+        {
+            _refreshingAllTabs = false;
+            _refreshAllTabsCancellation.Dispose();
+            _refreshAllTabsCancellation = null;
+            if (_refreshAllTabsButton is not null) _refreshAllTabsButton.Text = "⟳⟳";
+        }
+    }
+
+    private async Task UpdateTabFaviconAsync(WebView2 browser, TabPage page)
+    {
+        if (browser.CoreWebView2 is null || page.IsDisposed) return;
+        try
+        {
+            await using var stream = await browser.CoreWebView2.GetFaviconAsync(CoreWebView2FaviconImageFormat.Png);
+            if (stream.Length == 0) return;
+            using var source = Image.FromStream(stream);
+            var favicon = new Bitmap(source);
+            if (IsDisposed || page.IsDisposed)
+            {
+                favicon.Dispose();
+                return;
+            }
+            BeginInvoke(() =>
+            {
+                if (page.IsDisposed)
+                {
+                    favicon.Dispose();
+                    return;
+                }
+                DisposeTabFavicon(page);
+                _tabFavicons[page] = favicon;
+                page.Parent?.Invalidate();
+            });
+        }
+        catch
+        {
+            // Some pages do not expose a favicon. The tab renderer keeps its fallback icon.
+        }
+    }
+
+    private void DisposeTabFavicon(TabPage page)
+    {
+        if (!_tabFavicons.Remove(page, out var favicon)) return;
+        favicon.Dispose();
     }
 
     private async Task<TabPage> CreateBrowserTabPageAsync(TabControl inner, BrowserWorkspace workspace, BrowserTab tab, bool select = true)
@@ -389,6 +516,7 @@ public sealed class MainForm : Form
         UpdateBrowserTabCaption(page, tab);
         page.ContextMenuStrip = BuildBrowserTabMenu(inner, page);
         InsertBeforeNewTabButton(inner, page);
+        UpdateBrowserTabLayout(inner);
         if (select) inner.SelectedTab = page;
         await AddBrowserAsync(page, workspace, tab);
         return page;
@@ -423,6 +551,7 @@ public sealed class MainForm : Form
                 var title = browser.CoreWebView2.DocumentTitle;
                 if (!string.IsNullOrWhiteSpace(title)) UpdateBrowserTabCaption(page, tab, title);
             });
+            browser.CoreWebView2.FaviconChanged += async (_, _) => await UpdateTabFaviconAsync(browser, page);
             browser.CoreWebView2.SourceChanged += (_, _) => BeginInvoke(() => WebViewSourceChanged(browser, tab));
             browser.CoreWebView2.NavigationStarting += (_, _) => _status.Text = $"กำลังเปิด {tab.Name}...";
             browser.CoreWebView2.NavigationCompleted += (_, e) =>
@@ -441,6 +570,7 @@ public sealed class MainForm : Form
             };
             var startUrl = _config.RestoreLastSession ? tab.CurrentUrl ?? tab.Url : tab.Url;
             browser.Source = new Uri(ToNavigationUrl(startUrl));
+            await UpdateTabFaviconAsync(browser, page);
         }
         catch (Exception ex)
         {
@@ -468,31 +598,31 @@ public sealed class MainForm : Form
 
     private void EnsureNewTabButton(TabControl inner)
     {
-        var button = inner.TabPages.Cast<TabPage>()
-            .FirstOrDefault(page => ReferenceEquals(page.Tag, NewTabButtonTag));
-        if (button is null)
+        if (inner.Controls.Find(NewTabButtonName, false).FirstOrDefault() is not Button button)
         {
-            button = new TabPage("+")
+            button = new Button
             {
-                Tag = NewTabButtonTag,
-                ToolTipText = L.T("เปิด Tab ใหม่ (Ctrl+T)", "New tab (Ctrl+T)"),
+                Name = NewTabButtonName,
+                Text = "+",
+                Width = NewTabButtonWidth,
+                Height = 28,
+                Anchor = AnchorStyles.Top | AnchorStyles.Right,
+                TabStop = false,
                 AccessibleName = L.T("เปิด Tab ใหม่", "New tab")
             };
-            inner.TabPages.Add(button);
+            button.Click += async (_, _) => await AddNewTabAsync();
+            new ToolTip().SetToolTip(button, L.T("เปิด Tab ใหม่ (Ctrl+T)", "New tab (Ctrl+T)"));
+            inner.Controls.Add(button);
+            button.BringToFront();
+            ThemeManager.Apply(button);
         }
-        else if (inner.TabPages.IndexOf(button) != inner.TabCount - 1)
-        {
-            inner.TabPages.Remove(button);
-            inner.TabPages.Add(button);
-        }
+        UpdateBrowserTabLayout(inner);
     }
 
-    private static void InsertBeforeNewTabButton(TabControl inner, TabPage page)
+    private void InsertBeforeNewTabButton(TabControl inner, TabPage page)
     {
-        var buttonIndex = inner.TabPages.Cast<TabPage>().ToList()
-            .FindIndex(item => ReferenceEquals(item.Tag, NewTabButtonTag));
-        if (buttonIndex < 0) inner.TabPages.Add(page);
-        else inner.TabPages.Insert(buttonIndex, page);
+        inner.TabPages.Add(page);
+        UpdateBrowserTabLayout(inner);
     }
 
     private void CloseTab(TabControl inner, TabPage page, bool remember = true)
@@ -501,7 +631,9 @@ public sealed class MainForm : Form
         {
             externalHost.Detach();
             inner.TabPages.Remove(page);
+            DisposeTabFavicon(page);
             page.Dispose();
+            UpdateBrowserTabLayout(inner);
             _status.Text = "นำหน้าต่างโปรแกรมกลับออกมาแล้ว";
             SyncAddress();
             return;
@@ -522,7 +654,9 @@ public sealed class MainForm : Form
                 _config.RecentlyClosedTabs.RemoveRange(50, _config.RecentlyClosedTabs.Count - 50);
         }
         inner.TabPages.Remove(page);
+        DisposeTabFavicon(page);
         page.Dispose();
+        UpdateBrowserTabLayout(inner);
         ConfigStore.Save(_config);
         SyncAddress();
     }
@@ -585,6 +719,7 @@ public sealed class MainForm : Form
         inner.SelectedTab = page;
         PersistBrowserTabOrder(inner);
         inner.Invalidate();
+        UpdateBrowserTabLayout(inner);
         _status.Text = tab.IsPinned ? L.T("ปักหมุด Tab แล้ว", "Tab pinned") : L.T("เลิกปักหมุด Tab แล้ว", "Tab unpinned");
         UpdatePinButtonState();
     }
@@ -625,6 +760,7 @@ public sealed class MainForm : Form
         var target = source.IsPinned ? pinnedCount : Math.Max(pinnedCount, sourceUiIndex + 1);
         inner.TabPages.Insert(Math.Min(target, inner.TabCount), duplicatePage);
         EnsureNewTabButton(inner);
+        UpdateBrowserTabLayout(inner);
         inner.SelectedTab = duplicatePage;
         PersistBrowserTabOrder(inner);
         _status.Text = L.T("ทำสำเนา Tab แล้ว", "Tab duplicated");
@@ -649,7 +785,16 @@ public sealed class MainForm : Form
         using var background = new SolidBrush(backgroundColor);
         e.Graphics.FillRectangle(background, bounds);
         var pinned = tabs.TabPages[e.Index].Tag is BrowserTab { IsPinned: true };
-        var textBounds = new Rectangle(bounds.X + 8, bounds.Y + 4, bounds.Width - (pinned ? 8 : CloseButtonWidth + 8), bounds.Height - 6);
+        var iconSize = Math.Min(16, Math.Max(0, bounds.Width - (pinned ? 8 : CloseButtonWidth + 8)));
+        var iconLeft = bounds.X + 8;
+        if (_tabFavicons.TryGetValue(tabs.TabPages[e.Index], out var favicon) && iconSize >= 10)
+            e.Graphics.DrawImage(favicon, new Rectangle(iconLeft, bounds.Y + (bounds.Height - iconSize) / 2, iconSize, iconSize));
+        else if (iconSize >= 10)
+            TextRenderer.DrawText(e.Graphics, "◉", Font, new Rectangle(iconLeft, bounds.Y, iconSize, bounds.Height), foregroundColor,
+                TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter);
+        var textLeft = iconSize >= 10 ? iconLeft + iconSize + 6 : iconLeft;
+        var textBounds = new Rectangle(textLeft, bounds.Y + 4,
+            Math.Max(0, bounds.Right - textLeft - (pinned ? 6 : CloseButtonWidth + 3)), bounds.Height - 6);
         TextRenderer.DrawText(e.Graphics, tabs.TabPages[e.Index].Text, Font, textBounds, foregroundColor,
             TextFormatFlags.EndEllipsis | TextFormatFlags.VerticalCenter | TextFormatFlags.Left);
         if (!pinned)
@@ -725,6 +870,7 @@ public sealed class MainForm : Form
         tabs.TabPages.Remove(page);
         tabs.TabPages.Insert(target, page);
         EnsureNewTabButton(tabs);
+        UpdateBrowserTabLayout(tabs);
         tabs.SelectedTab = page;
         PersistBrowserTabOrder(tabs);
     }
@@ -1295,6 +1441,7 @@ public sealed class MainForm : Form
         if (string.IsNullOrWhiteSpace(url)) return;
 
         tab.CurrentUrl = url;
+        if (browser.Parent is TabPage page) UpdateBrowserTabCaption(page, tab);
         SyncAddressFrom(browser);
         SaveSession();
     }
@@ -1506,6 +1653,7 @@ public sealed class MainForm : Form
                      .Where(page => page.Tag is BrowserTab tab && !configuredIds.Contains(tab.Id)).ToList())
         {
             inner.TabPages.Remove(page);
+            DisposeTabFavicon(page);
             page.Dispose();
         }
 
@@ -1527,6 +1675,7 @@ public sealed class MainForm : Form
 
         foreach (var tab in workspace.Tabs.Where(tab => tab.IsOpen && !openIds.Contains(tab.Id)))
             await CreateBrowserTabPageAsync(inner, workspace, tab, false);
+        UpdateBrowserTabLayout(inner);
 
         if (_workspaceTabs.SelectedTab is { } outer)
         {
@@ -1608,6 +1757,7 @@ public sealed class MainForm : Form
         {
             inner.TabPages.Remove(page);
             page.Dispose();
+            UpdateBrowserTabLayout(inner);
             MessageBox.Show("ไม่สามารถฝังหน้าต่างนี้ได้", "ไม่รองรับ", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             return;
         }
@@ -1617,6 +1767,7 @@ public sealed class MainForm : Form
             host.Detach();
             inner.TabPages.Remove(page);
             page.Dispose();
+            UpdateBrowserTabLayout(inner);
             _status.Text = "นำหน้าต่างโปรแกรมกลับออกมาแล้ว";
         });
         menu.Items.Add(L.T("ปิดหน้าต่างโปรแกรม...", "Close external program..."), null, (_, _) =>
@@ -1630,6 +1781,7 @@ public sealed class MainForm : Form
             host.CloseExternalWindow();
             inner.TabPages.Remove(page);
             page.Dispose();
+            UpdateBrowserTabLayout(inner);
             _status.Text = $"ส่งคำสั่งปิด {title} แล้ว";
         });
         page.ContextMenuStrip = menu;
@@ -1668,8 +1820,9 @@ public sealed class MainForm : Form
     private static void UpdateBrowserTabCaption(TabPage page, BrowserTab tab, string? title = null)
     {
         if (!string.IsNullOrWhiteSpace(title)) tab.Name = title;
-        page.ToolTipText = tab.Name;
-        page.Text = tab.IsPinned ? "📌" : ShortTitle(tab.Name);
+        var url = tab.CurrentUrl ?? tab.Url;
+        page.ToolTipText = string.IsNullOrWhiteSpace(url) ? tab.Name : $"{tab.Name}\r\n{url}";
+        page.Text = ShortTitle(tab.Name);
     }
 
     private static string ShortTitle(string title) => title.Length > 28 ? title[..28] + "…" : title;
