@@ -4,6 +4,26 @@
 
 ยังไม่ได้กำหนดหัวข้อและหมายเลขเวอร์ชันสำหรับอัปเดตถัดไป
 
+### Requested: Refresh All Open Tabs in Current Instance
+
+- เพิ่มปุ่มบน Toolbar หรือเมนู Instance สำหรับ Refresh Web Tab ที่เปิดอยู่ทั้งหมดใน Instance ปัจจุบัน
+- ใช้ Tooltip `รีเฟรช Tab ที่เปิดอยู่ทั้งหมด` / `Refresh all open tabs`
+- Refresh เฉพาะ Tab ที่มี WebView เปิดอยู่จริง โดยไม่เปิด Tab ที่ปิดหรือสร้าง WebView ใหม่
+- ข้าม External Program Tab, ปุ่ม `+`, Tab ที่กำลังปิด และ WebView ที่ยัง Initialize ไม่สำเร็จ
+- Refresh แบบทยอยเป็นคิวหรือจำกัดจำนวนพร้อมกัน เพื่อลด CPU, Memory และ Network spike
+- แสดง Progress บน Status bar เช่น `กำลังรีเฟรช 3/8 Tab` และสรุปจำนวนสำเร็จ/ล้มเหลว
+- ป้องกันการกดคำสั่งซ้ำระหว่างคิวเดิมกำลังทำงาน และมีคำสั่งยกเลิกหากใช้เวลานาน
+- รักษาลำดับ Tab, Focused Tab, Pin, Login, Cookie, Profile และ Session เดิม
+
+### Refresh All Open Tabs Acceptance Criteria
+
+- กดหนึ่งครั้งแล้ว Web Tab ที่เปิดอยู่ทั้งหมดใน Instance ปัจจุบันต้องได้รับคำสั่ง Refresh
+- Tab ใน Instance อื่นและ Tab ที่ปิดอยู่ต้องไม่ถูกเปิดหรือ Refresh
+- External Program Tab และปุ่ม `+` ต้องไม่ได้รับผลกระทบ
+- โปรแกรมต้องยังตอบสนองระหว่าง Refresh และไม่ส่งคำสั่งซ้ำให้ Tab เดียวกันในหนึ่งรอบ
+- หากบางหน้า Refresh ไม่สำเร็จ ต้องทำ Tab อื่นต่อและแสดงผลลัพธ์โดยไม่ปิดโปรแกรม
+- หลัง Refresh ต้องยังอยู่ที่ Instance และ Tab ที่ผู้ใช้กำลัง Focus ก่อนเริ่มคำสั่ง
+
 ## Completed in v2.1.2
 
 ### Single Instance Protection
