@@ -153,6 +153,9 @@ public sealed class MainForm : Form
         };
         _workspaceTabs.AllowDrop = true;
         _workspaceTabs.DrawMode = TabDrawMode.OwnerDrawFixed;
+        _workspaceTabs.SizeMode = TabSizeMode.Normal;
+        _workspaceTabs.Padding = new Point(14, 4);
+        _workspaceTabs.ShowToolTips = true;
         _workspaceTabs.DrawItem += DrawWorkspaceTab;
         _workspaceTabs.MouseDown += WorkspaceTabsMouseDown;
         _workspaceTabs.MouseMove += WorkspaceTabsMouseMove;
@@ -321,7 +324,7 @@ public sealed class MainForm : Form
             _status.Text = "กำลังเปิด Workspace...";
             foreach (var workspace in _config.Workspaces)
             {
-                var outer = new TabPage(workspace.Name) { Tag = workspace };
+                var outer = new TabPage(workspace.Name) { Tag = workspace, ToolTipText = workspace.Name };
                 var inner = CreateBrowserTabControl();
                 outer.Controls.Add(inner);
                 _workspaceTabs.TabPages.Add(outer);
@@ -746,8 +749,10 @@ public sealed class MainForm : Form
         using var brush = new SolidBrush(color);
         e.Graphics.FillRectangle(brush, e.Bounds);
         var foreground = color.GetBrightness() < 0.5f ? Color.White : Color.Black;
-        TextRenderer.DrawText(e.Graphics, page.Text, Font, e.Bounds, foreground,
-            TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.EndEllipsis);
+        var textBounds = Rectangle.Inflate(e.Bounds, -8, 0);
+        TextRenderer.DrawText(e.Graphics, page.Text, Font, textBounds, foreground,
+            TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter |
+            TextFormatFlags.EndEllipsis | TextFormatFlags.NoPrefix | TextFormatFlags.SingleLine);
     }
 
     private void WorkspaceTabsMouseDown(object? sender, MouseEventArgs e)
@@ -1523,7 +1528,11 @@ public sealed class MainForm : Form
         foreach (var tab in workspace.Tabs.Where(tab => tab.IsOpen && !openIds.Contains(tab.Id)))
             await CreateBrowserTabPageAsync(inner, workspace, tab, false);
 
-        if (_workspaceTabs.SelectedTab is { } outer) outer.Text = workspace.Name;
+        if (_workspaceTabs.SelectedTab is { } outer)
+        {
+            outer.Text = workspace.Name;
+            outer.ToolTipText = workspace.Name;
+        }
         _workspaceTabs.Invalidate();
         ConfigStore.Save(_config);
         SyncAddress();

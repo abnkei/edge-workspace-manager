@@ -5,8 +5,40 @@ namespace EdgeWorkspaceManager;
 
 internal static class Program
 {
+    private const string SingleInstanceMutexName = @"Local\EdgeWorkspaceManager-7F92583D-231E-4B77-91BD-FF5215EAAC9A";
+
     [STAThread]
     static void Main(string[] args)
+    {
+        using var singleInstanceMutex = new Mutex(false, SingleInstanceMutexName);
+        var ownsMutex = false;
+        try
+        {
+            try { ownsMutex = singleInstanceMutex.WaitOne(TimeSpan.Zero, false); }
+            catch (AbandonedMutexException) { ownsMutex = true; }
+            if (!ownsMutex)
+            {
+                ApplicationConfiguration.Initialize();
+                try { L.SetLanguage(ConfigStore.Load().Settings.Language); } catch { }
+                MessageBox.Show(
+                    L.T(
+                        "Edge Workspace Manager กำลังเปิดใช้งานอยู่แล้ว\r\n\r\nไม่สามารถเปิดโปรแกรมซ้ำได้ กรุณาใช้หน้าต่างที่เปิดอยู่",
+                        "Edge Workspace Manager is already running.\r\n\r\nAnother instance cannot be opened. Please use the existing window."),
+                    "Edge Workspace Manager",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
+                return;
+            }
+
+            RunApplication(args);
+        }
+        finally
+        {
+            if (ownsMutex) singleInstanceMutex.ReleaseMutex();
+        }
+    }
+
+    private static void RunApplication(string[] args)
     {
         for (var index = 0; index + 1 < args.Length; index += 2)
             if (string.Equals(args[index], "--update-health", StringComparison.OrdinalIgnoreCase))
@@ -40,7 +72,7 @@ public static class AppInfo
             var value = Assembly.GetExecutingAssembly()
                 .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion
                 ?? Assembly.GetExecutingAssembly().GetName().Version?.ToString(3)
-                ?? "2.1.1";
+                ?? "2.1.2";
             var metadata = value.IndexOf('+');
             return metadata >= 0 ? value[..metadata] : value;
         }
@@ -48,6 +80,13 @@ public static class AppInfo
 
     public static IReadOnlyList<(string Version, string Date, string[] Changes)> ReleaseNotes { get; } =
     [
+        ("2.1.2", "18 กรกฎาคม 2026",
+        [
+            "เพิ่ม Single Instance Protection ป้องกันการเปิดโปรแกรมซ้ำใน Windows session เดียวกัน",
+            "เมื่อเปิดซ้ำจะแจ้งเตือนเป็นภาษาไทยหรือ English โดยไม่กระทบหน้าต่างและ Session เดิม",
+            "ปรับความกว้าง Instance Tab ด้านบนตามชื่ออัตโนมัติ พร้อม Padding และ Tooltip ชื่อเต็ม",
+            "รองรับการเปลี่ยนชื่อ Instance, DPI Scaling, สี Instance และการลากเรียงตามเดิม"
+        ]),
         ("2.1.1", "18 กรกฎาคม 2026",
         [
             "เพิ่มหน้าต่างยืนยันก่อนปิดโปรแกรมด้วยปุ่ม X หรือ Alt+F4 โดยมีปุ่มไม่ปิดเป็นค่าเริ่มต้น",

@@ -47,13 +47,14 @@
 - ตรวจ Manifest, จำนวนรายการ และ SHA-256 ก่อน Import โดยไม่รวม Cookie, Login, Password หรือ WebView2 Profile
 - ถามยืนยันก่อนปิดโปรแกรมด้วยปุ่ม `X` หรือ `Alt+F4` และบันทึก Session ก่อนออก
 - ปุ่ม `+` ต่อจาก Tab สุดท้ายสำหรับเปิด Tab ใหม่ใน Instance ปัจจุบัน
+- ป้องกันการเปิดโปรแกรมซ้ำมากกว่าหนึ่ง Process ใน Windows session เดียวกัน
 
 ## Build เป็น EXE
 
 1. ติดตั้ง .NET 8 SDK บน Windows
 2. แตก ZIP
 3. ดับเบิลคลิก `build.bat`
-4. ไฟล์จะอยู่ที่ `releases\v2.1.1\EdgeWorkspaceManager.exe`
+4. ไฟล์จะอยู่ที่ `releases\v2.1.2\EdgeWorkspaceManager.exe`
 
 เลขเวอร์ชันจะแสดงบนแถบสถานะด้านล่างของโปรแกรม กดที่เลขเวอร์ชันเพื่อดูรายการอัปเดตทั้งหมด
 
