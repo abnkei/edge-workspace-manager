@@ -4,6 +4,8 @@
 
 ยังไม่ได้กำหนดหัวข้อและหมายเลขเวอร์ชันสำหรับอัปเดตถัดไป
 
+## Completed in v2.1.3
+
 ### Requested: Refresh All Open Tabs in Current Instance
 
 - เพิ่มปุ่มบน Toolbar หรือเมนู Instance สำหรับ Refresh Web Tab ที่เปิดอยู่ทั้งหมดใน Instance ปัจจุบัน

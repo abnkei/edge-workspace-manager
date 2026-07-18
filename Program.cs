@@ -72,7 +72,7 @@ public static class AppInfo
             var value = Assembly.GetExecutingAssembly()
                 .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion
                 ?? Assembly.GetExecutingAssembly().GetName().Version?.ToString(3)
-                ?? "2.1.2";
+                ?? "2.1.3";
             var metadata = value.IndexOf('+');
             return metadata >= 0 ? value[..metadata] : value;
         }
@@ -80,6 +80,13 @@ public static class AppInfo
 
     public static IReadOnlyList<(string Version, string Date, string[] Changes)> ReleaseNotes { get; } =
     [
+        ("2.1.3", "19 กรกฎาคม 2026",
+        [
+            "เพิ่มปุ่ม Refresh All Tabs สำหรับรีเฟรช Web Tab ที่เปิดอยู่ทั้งหมดใน Instance ปัจจุบันแบบทยอยทำงาน",
+            "แสดง Progress และผลสำเร็จ/ล้มเหลว โดยรักษา Instance และ Tab ที่กำลัง Focus",
+            "ปรับ Web Tab ให้กว้างเท่ากันและย่อหรือขยายพร้อมกันตามขนาดหน้าต่างโดยไม่มีลูกศรเลื่อน",
+            "เพิ่ม Favicon หน้า Tab Title พร้อมไอคอนสำรอง Tooltip และปุ่ม New Tab แบบแยกขนาดคงที่"
+        ]),
         ("2.1.2", "18 กรกฎาคม 2026",
         [
             "เพิ่ม Single Instance Protection ป้องกันการเปิดโปรแกรมซ้ำใน Windows session เดียวกัน",

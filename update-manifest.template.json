@@ -1,18 +1,18 @@
 {
-  "version": "2.1.2",
-  "releaseDate": "2026-07-18T00:00:00Z",
+  "version": "2.1.3",
+  "releaseDate": "2026-07-19T00:00:00Z",
   "downloadUrl": "https://github.com/abnkei/edge-workspace-manager/releases/latest/download/EdgeWorkspaceManager-win-x64.zip",
   "sha256": "GENERATED_BY_GITHUB_ACTIONS",
   "size": 0,
   "priority": "recommended",
   "releaseNotesTh": [
-    "เพิ่ม Single Instance Protection ป้องกันการเปิดโปรแกรมซ้ำและแจ้งเตือนโดยไม่กระทบหน้าต่างเดิม",
-    "ปรับความกว้าง Instance Tab ด้านบนตามชื่ออัตโนมัติ พร้อม Padding และ Tooltip",
-    "รองรับการเปลี่ยนชื่อ Instance, DPI Scaling, สี Instance และการลากเรียงตามเดิม"
+    "เพิ่มปุ่ม Refresh All Tabs สำหรับรีเฟรช Web Tab ทั้งหมดใน Instance ปัจจุบันพร้อม Progress",
+    "ปรับ Web Tab ให้กว้างเท่ากันและย่อขยายพร้อมกันโดยไม่มีลูกศรเลื่อน",
+    "เพิ่ม Favicon หน้า Tab Title พร้อมไอคอนสำรองและปุ่ม New Tab แบบแยกขนาดคงที่"
   ],
   "releaseNotesEn": [
-    "Prevent duplicate application launches with Single Instance protection while preserving the existing window",
-    "Automatically size top Instance tabs from their names with padding and full-name tooltips",
-    "Preserve instance renaming, DPI scaling, colors, focus, and drag ordering behavior"
+    "Refresh every open web tab in the current instance with progress and per-tab failure isolation",
+    "Keep web tabs equally wide and resize them together without native scroll arrows",
+    "Show website favicons with a fallback icon and a separate fixed-width New Tab button"
   ]
 }
